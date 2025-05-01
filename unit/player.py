@@ -1,10 +1,9 @@
 import random
 import importlib
+import os
 
 from tabulate import tabulate
 import pandas as pd
-
-# from character_class import Warrior
 
 class Player():
     def __init__(self, **kwargs):
@@ -39,20 +38,20 @@ class Player():
             module = importlib.import_module(class_module)
         
         
-        if hasattr(module, 'Warrior'):
-            warrior_class = getattr(module, 'Warrior')  # Warrior 클래스를 가져옴
-            warrior_instance = warrior_class()  # Warrior 인스턴스를 생성
-            stats = warrior_instance.get_status()  # get_status 호출
-            
-            self.hp += stats.get('hp', 0)
-            self.mp += stats.get('mp', 0)
-            
-            self.STR += stats.get('STR', 0)
-            self.AGI += stats.get('AGI', 0)
-            self.INT += stats.get('INT', 0)
-            
-            self.attack_score += stats.get('attack_score', 0)
-            self.defense_score += stats.get('defense_score', 0)
+            if hasattr(module, 'Warrior'):
+                warrior_class = getattr(module, 'Warrior')  # Warrior 클래스를 가져옴
+                warrior_instance = warrior_class()  # Warrior 인스턴스를 생성
+                stats = warrior_instance.get_status()  # get_status 호출
+                
+                self.hp += stats.get('hp', 0)
+                self.mp += stats.get('mp', 0)
+                
+                self.STR += stats.get('STR', 0)
+                self.AGI += stats.get('AGI', 0)
+                self.INT += stats.get('INT', 0)
+                
+                self.attack_score += stats.get('attack_score', 0)
+                self.defense_score += stats.get('defense_score', 0)
         
         # elif self.CLASS == '마법사':
         #     pass
@@ -63,6 +62,8 @@ class Player():
         # elif self.CLASS == '상인':
         #     pass
         # elif self.CLASS == '도적':
+        #     pass
+        # else:
         #     pass
         
     # 공격하기
@@ -154,9 +155,9 @@ class Player():
         self.honor = data['honor']
         self.CLASS = data['CLASS']
         self.name = data['name']
-        pass
         
     def DisplayStatus(self):
+        os.system('clear')
         MAX_LENGTH = 50
         
         # 빈 DataFrame 생성: 4열로 생성
@@ -185,4 +186,4 @@ class Player():
         display_status.fillna('', inplace=True)
         
 
-        print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]))
+        print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]), '\n')
