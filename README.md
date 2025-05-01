@@ -5,9 +5,9 @@
 
 # 생각나는 작업 목록 (0501)
 - [ ] 메인 화면 <span style="opacity: 0.3;">(0501)</span>
-  - [ ] 캐릭터 생성시 닉네임 중복 확인 <span style="opacity: 0.3;">(0501)</span>
-  - [ ] 캐릭터 생성시 데이터 저장하기 <span style="opacity: 0.3;">(0501)</span>
-  - [ ] 캐릭터 로드하기 <span style="opacity: 0.3;">(0501)</span>
+  - [x] 캐릭터 생성시 닉네임 중복 확인 <span style="opacity: 0.3;">(0501)</span>
+  - [x] 캐릭터 생성시 데이터 저장하기 <span style="opacity: 0.3;">(0501)</span>
+  - [x] 캐릭터 로드하기 <span style="opacity: 0.3;">(0501)</span>
 - [ ] 캐릭터 <span style="opacity: 0.3;">(0501)</span>
   - [ ] 직업 만들기 <span style="opacity: 0.3;">(0501)</span>
   - [ ] 직업별 스텟 조정하기 (0501) <span style="opacity: 0.3;">(0501)</span>
