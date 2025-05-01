@@ -1,8 +1,10 @@
 import importlib
 from unit.player import Player
 from saves.save_loads import SAVE_LOADS
+import os
 
 def select_charater_display():
+    os.system('clear')
     print('='*50)
     name = input('캐릭터 이름을 입력해주세요')
     CLASS = input(
@@ -20,6 +22,7 @@ def select_charater_display():
     
     return name, CLASS
 def Display():
+    os.system('clear')
     svld = SAVE_LOADS()
     SAMENAME = 1
     while (SAMENAME):
@@ -35,9 +38,13 @@ def Display():
             player = Player(name=name, CLASS = CLASS)
             
             data = player.status()
-            SAMENAME = svld.update_player_data(data)
+            SAMENAME = svld.data_update(data)
         elif sel == '2':
-            svld.save_loads()
+            player_data = svld.data_load()
+            
+            if not bool(player_data):
+                SAMENAME = 1
+
         elif sel == '3':
             print('종료')
             return 

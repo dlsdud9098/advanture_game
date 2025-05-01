@@ -15,7 +15,7 @@ class Player():
         self.skills = []                    # 개체의 스킬
         self.inventory = []                     # 개체가 소지하고 있는 아이템
         self.use_items = []                 # 착용하고 있는 아이템
-        self.unit_type = ''                 # 개체 타입(몬스터, 유닛, npc 등)
+        self.unit_type = 'Player'                 # 개체 타입(몬스터, 유닛, npc 등)
         self.money = 1000                   # 개체가 소지하고 있는 골드(또는 드랍하는 골드)
         self.STR = 10                       # 개체의 힘 (공격력, 체력)
         self.AGI = 10                       # 개체의 민첩 (회피, 방어력)
@@ -107,7 +107,56 @@ class Player():
         return bar
     
     # 현제 스테이터스 보기
-    def status(self):
+    def status(self):        
+        return {
+            "mp" : self.mp,
+            "hp" : self.hp,
+            "attack_score" : self.attack_score,
+            "defense_score" : self.defense_score,
+            "skills" : self.skills,
+            "inventory" : self.inventory,
+            "use_items" : self.use_items,
+            "unit_type" : self.unit_type,
+            "money" : self.money,
+            "STR" : self.STR,
+            "AGI" : self.AGI,
+            "INT" : self.INT,
+            "LUCK" : self.LUCK,
+            "AVOID" : self.AVOID,
+            "experience" : self.experience,
+            "skillpoint" : self.skillpoint,
+            "LV" : self.LV,
+            "honor" : self.honor,
+            "CLASS" : self.CLASS,
+            "name" : self.name
+        }
+        
+    # 직접 지정(캐릭터 불러올 때)
+    def set_status(self, data):
+        
+        self.mp = data['mp']
+        self.hp = data['hp']
+        self.attack_score = data['attack_score']
+        self.defense_score = data['defense_score']
+        self.skills = data['skills']
+        self.inventory = data['inventory']
+        self.use_items = data['use_items']
+        self.unit_type = data['unit_type']
+        self.money = data['money']
+        self.STR = data['STR']
+        self.AGI = data['AGI']
+        self.INT = data['INT']
+        self.LUCK = data['LUCK']
+        self.AVOID = data['AVOID']
+        self.experience = data['experience']
+        self.skillpoint = data['skillpoint']
+        self.LV = data['LV']
+        self.honor = data['honor']
+        self.CLASS = data['CLASS']
+        self.name = data['name']
+        pass
+        
+    def DisplayStatus(self):
         MAX_LENGTH = 50
         
         # 빈 DataFrame 생성: 4열로 생성
@@ -137,22 +186,3 @@ class Player():
         
 
         print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]))
-        
-        return {
-            "LV": self.LV,
-            "name": self.name,
-            "CLASS": self.CLASS,
-            "hp": self.hp,
-            "mp": self.mp,
-            "STR": self.STR,
-            "AGI": self.AGI,
-            "INT": self.INT,
-            "money": self.money,
-            "attack_score": self.attack_score,
-            "defense_score": self.defense_score,
-            "honor": self.honor,
-            "experience": self.experience,
-            "skillpoint": self.skillpoint,
-            "skills": self.skills,
-            "use_items": self.inventory,
-        }

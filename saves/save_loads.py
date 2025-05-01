@@ -1,51 +1,79 @@
 import json
+import os
+
+from unit.player import Player
+
+import pandas as pd
+from tabulate import tabulate
 
 class SAVE_LOADS:
     def __init__(self):
-        with open('saves/datas/saves.json', 'r') as f:
-            self.datas = json.load(f)
+        try:
+            with open('saves/datas/saves.json', 'w', encoding='utf-8') as f:
+                json.dump([], f, indent=4)
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
     
-    # 세이브된 데이터 목록 보기
-    def save_loads(self):
-        with open('saves/datas/saves.json', 'r') as f:
-            self.datas = json.load(f)
-        
-        
-        (f"{self.datas['LV']}, {self.datas['name']}")
-    
-    # 데이터 새로 저장하기
-    def save(self, data):
-        print(data)
+    # 데이터 저장하기
+    def data_save(self, player_datas):
         with open('saves/datas/saves.json', 'w', encoding='utf-8') as f:
+            json.dump(player_datas, f, indent=4)
+        
+    # 데이터 가져오기
+    def data_load(self):
+        with open('saves/datas/saves.json', 'r', encoding='utf-8') as f:
+            player_datas = json.load(f)
             
-            for player in data:
-                json.dump(player, indent=4)
+        print(player_datas)
+        print()
+        print(os.getcwd())
+        print()
+
+        # 데이터가 없으면
+        if not bool(player_datas):
+            player_datas = []
+            print('데이터가 비어있습니다.')
+
+        return player_datas
+
+    # 새로운 플레이어 데이터 추가하기
+    def data_update(self, data):
+        player_datas = self.data_load()
+        
+        # 데이터 비어있음
+        if not bool(player_datas):
+            player_datas.append(data)
+        else:
+            if player_datas['name'] == data['name']:
+                print('중복된 이름입니다.')
+                return 1
+        player_datas.append(data)
+        self.data_save(player_datas)
     
-    def update_player_data(self, data):
-        player_data = self.load_player_data()
-
-        for player in player_data:
-            if data['name'] == player['name']:
-                print('이름이 이미 존재함')
-            else:
-                player_data.append(data)
-                
-                self.save(player_data)
-                return 0
-        
-        
-    def load_player_data(self):
-        player_data = []
-        with open('saves/datas/saves.json', 'r') as f:
-            data = json.load(f)
-        
-        player_data.append(data)
-
-        return player_data
-
-    # 데이터 불러오기
-    def load(self):
-        pass
-    
-    def display_save_data(self):
-        pass
+    # 플레이어 로드하기
+    def player_load(self, data):
+        player = Player()
+        player.set_status(
+            {
+            "mp" : data['mp'],
+            "hp" : data['hp'],
+            "attack_score" : data['attack_score'],
+            "defense_score" : data['defense_score'],
+            "skills" : data['skills'],
+            "inventory" : data['inventory'],
+            "use_items" : data['use_items'],
+            "unit_type" : data['unit_type'],
+            "money" : data['money'],
+            "STR" : data['STR'],
+            "AGI" : data['AGI'],
+            "INT" : data['INT'],
+            "LUCK" : data['LUCK'],
+            "AVOID" : data['AVOID'],
+            "experience" : data['experience'],
+            "skillpoint" : data['skillpoint'],
+            "LV" : data['LV'],
+            "honor" : data['honor'],
+            "CLASS" : data['CLASS'],
+            "name" : data['name']
+            }
+        )
