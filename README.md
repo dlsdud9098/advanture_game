@@ -36,33 +36,33 @@
 https://github.com/dlsdud9098/advanture_game
 
 # 구조
-├── README.md
-├── develop_logs
-│   └── 0501 logs 01.md
-├── display
-│   ├── __pycache__
-│   │   └── display_select.cpython-311.pyc
-│   └── display_select.py
-├── main.py
-├── pyproject.toml
-├── saves
-│   ├── __pycache__
-│   │   └── save_loads.cpython-311.pyc
-│   ├── datas
-│   │   └── saves.json
-│   └── save_loads.py
-├── temp.ipynb
-├── unit
-│   ├── __pycache__
-│   │   ├── create_character.cpython-311.pyc
-│   │   └── player.cpython-311.pyc
-│   ├── character_class
-│   │   ├── __pycache__
-│   │   │   └── warrior.cpython-311.pyc
-│   │   ├── character_settings.md
-│   │   └── warrior.py
-│   ├── create_character.py
-│   ├── item.py
-│   ├── monster.py
-│   └── player.py
-└── uv.lock
+├── README.md  
+├── develop_logs  
+│   └── 0501 logs 01.md  
+├── display  
+│   ├── __pycache__  
+│   │   └── display_select.cpython-311.pyc  
+│   └── display_select.py  
+├── main.py  
+├── pyproject.toml  
+├── saves  
+│   ├── __pycache__  
+│   │   └── save_loads.cpython-311.pyc  
+│   ├── datas  
+│   │   └── saves.json  
+│   └── save_loads.py  
+├── temp.ipynb  
+├── unit  
+│   ├── __pycache__  
+│   │   ├── create_character.cpython-311.pyc  
+│   │   └── player.cpython-311.pyc  
+│   ├── character_class  
+│   │   ├── __pycache__  
+│   │   │   └── warrior.cpython-311.pyc  
+│   │   ├── character_settings.md  
+│   │   └── warrior.py  
+│   ├── create_character.py  
+│   ├── item.py  
+│   ├── monster.py  
+│   └── player.py  
+└── uv.lock  
