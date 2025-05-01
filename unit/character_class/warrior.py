@@ -39,15 +39,15 @@ class Warrior:
     def class_skill_tree(self):
         self.skill_tree = [
             {
-                "skill_name": '내려치기',
-                "skill_level": 1,
-                "required_stat": [
+                "skill_name": '내려치기',                   # 스킬 이름
+                "skill_level": 1,                         # 스킬 레벨
+                "required_stat": [                        # 스킬을 사용하는데 필요 조건
                     {
                         "STR":  15,
                     }],
-                "skill_description": '강하게 내려친다.',
-                "skill_damage": 20,
-                "use_mana": 50
+                "skill_description": '강하게 내려친다.',     # 스킬 설명
+                "skill_damage": 20,                       # 스킬 데미지
+                "use_mana": 50                            # 필요 마나
             }
             ]
         return self.skill_tree
