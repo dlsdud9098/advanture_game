@@ -9,6 +9,7 @@
   - [x] 캐릭터 생성시 데이터 저장하기 <span style="opacity: 0.3;">(0501)</span>
   - [x] 캐릭터 로드하기 <span style="opacity: 0.3;">(0501)</span>
   - [ ] 난이도 설정 <span style="opacity: 0.3;">(0501)</span>
+  - [ ] 데이터 삭제 <span style="opacity: 0.3;">(0502)</span>
 - [ ] 캐릭터 <span style="opacity: 0.3;">(0501)</span>
   - [ ] 직업 만들기 <span style="opacity: 0.3;">(0501)</span>
   - [ ] 직업별 스텟 조정하기 (0501) <span style="opacity: 0.3;">(0501)</span>

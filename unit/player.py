@@ -12,9 +12,9 @@ class Player():
         self.attack_score = 10              # 개체의 공격력
         self.defense_score = 5              # 개체의 방어력
         self.skills = []                    # 개체의 스킬
-        self.inventory = []                     # 개체가 소지하고 있는 아이템
+        self.inventory = ['철 검']                 # 개체가 소지하고 있는 아이템
         self.use_items = []                 # 착용하고 있는 아이템
-        self.unit_type = 'Player'                 # 개체 타입(몬스터, 유닛, npc 등)
+        self.unit_type = 'Player'           # 개체 타입(몬스터, 유닛, npc 등)
         self.money = 1000                   # 개체가 소지하고 있는 골드(또는 드랍하는 골드)
         self.STR = 10                       # 개체의 힘 (공격력, 체력)
         self.AGI = 10                       # 개체의 민첩 (회피, 방어력)
@@ -27,6 +27,7 @@ class Player():
         self.honor = 0                      # 명성치
         self.CLASS = kwargs['CLASS']        # 직업
         self.name = kwargs['name']          # 개체 이름
+        self.max_inventory = 10             # 최대 인벤토리 크기
         
         self.init_status()                  # 캐릭터 만들기
         
@@ -81,7 +82,6 @@ class Player():
     def change_weapon(self):
         pass
     
-    
     # 소지하고 있는 골드
     def how_money(self):
         print(f"Gold: {self.money}")
@@ -107,8 +107,8 @@ class Player():
         bar = "#" * filled_length + "-" * (length - filled_length)  # #로 채우고, -로 빈 공간 채우기
         return bar
     
-    # 현제 스테이터스 보기
-    def status(self):        
+    # 현재 스테이터스 보기
+    def get_status(self):        
         return {
             "mp" : self.mp,
             "hp" : self.hp,
@@ -134,7 +134,6 @@ class Player():
         
     # 직접 지정(캐릭터 불러올 때)
     def set_status(self, data):
-        
         self.mp = data['mp']
         self.hp = data['hp']
         self.attack_score = data['attack_score']
@@ -158,11 +157,25 @@ class Player():
         
     def DisplayStatus(self):
         os.system('clear')
-        MAX_LENGTH = 50
         
         # 빈 DataFrame 생성: 4열로 생성
         display_status = pd.DataFrame(index=range(7), columns=range(4))
 
+        data = {
+            "Level": self.LV,
+            "Name": self.name,
+            "CLASS": self.CLASS,
+            "HP": self.hp,
+            "MP": self.mp,
+            "소지 골드": self.money,
+            "STR": self.STR,
+            "AGI": self.AGI,
+            "INT": self.INT
+        }
+        
+        # for idx, (key, value) in enumerate(data.items()):
+        #     display_status.iloc[idx, idx] = key
+        #     display_status.iloc[idx, idx+1] = value
         # 데이터 추가
         display_status.iloc[0, 0] = "Level"
         display_status.iloc[0, 1] = self.LV
@@ -187,3 +200,41 @@ class Player():
         
 
         print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]), '\n')
+        
+        # print(tabulate(display_status, tablefmt='grid', showindex=False, headers=[]), '\n')
+        sel = input(f"1. 장비 보기\n2. 인벤토리 보기\n{'='*50}\n")
+        
+        if sel == '1':
+            pass
+        elif sel == '2':
+            self.ViewInventory()
+        else:
+            print('잘못 입력하셨습니다.')
+        
+    def ViewInventory(self):
+        INVENTORY = self.inventory
+        
+        ch_class = 'item'
+        # 동적으로 character_class 모듈 불러오기
+        class_module = f"unit.{ch_class}"
+        module = importlib.import_module(class_module)
+    
+    
+        if hasattr(module, 'Item'):
+            item_class = getattr(module, 'Item')  # Warrior 클래스를 가져옴
+            item_instance = item_class()  # Warrior 인스턴스를 생성
+            
+            item_instance.LoadItem(INVENTORY[0])
+            # for name in INVENTORY:        
+            #     item = item_instance.LoadItem(name)  # get_status 호출
+                
+            #     item_name = item.get('name', '')
+            #     item_description = item.get('description', '')
+                
+            #     item_stat = item.get('stat', 0)
+            #     item_required_class = item.get('required_class', [])
+            #     item_required_stat = item.get('required_stat', [])
+                
+            #     item_attack_score = item.get('attack_score', 0)
+            #     item_defense_score = item.get('defense_score', 0)
+            

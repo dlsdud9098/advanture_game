@@ -25,10 +25,13 @@ def NewGameDisplay(svld):
     name, CLASS = select_charater_display()
     player = Player(name=name, CLASS = CLASS)
     
-    data = player.status()
+    data = player.get_status()
     SAMENAME = svld.data_update(data)
     
-    return SAMENAME
+    player.DisplayStatus()
+    
+    
+    return SAMENAME, player
 
 def LoadGameDisplay(player_data):
     os.system('clear')
@@ -48,7 +51,8 @@ def LoadGameDisplay(player_data):
     player.set_status(player_data[player_idx])
     
     player.DisplayStatus()
-    AGAIN = 0
+    return 0, player
+    
 
 def MainDisplay():
     os.system('clear')
@@ -66,20 +70,24 @@ def MainDisplay():
         sel = input()
         print(sel)
         if sel == '1':
-            SAMENAME = NewGameDisplay(svld)
+            SAMENAME, player = NewGameDisplay(svld)
         elif sel == '2':
             player_data = svld.data_load()
             if not bool(player_data):
+                os.system('clear')
+                print('데이터가 비어있습니다.')
                 SAMENAME = 1
             else:
                 AGAIN = 1
                 while (AGAIN):
-                    LoadGameDisplay(player_data)
+                    AGAIN, player = LoadGameDisplay(player_data)
+                break
         elif sel == '3':
             print('종료')
+            os.system('clear')
             return 
         else:
             print('잘못 입력하셨습니다.')
-
-    return sel
-    
+            os.system('clear')
+            
+        # GameStart(player)
