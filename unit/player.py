@@ -237,26 +237,14 @@ class Player():
                 
                 if sel == '1':
                     item_name = input('찾는 아이템: ')
-                    # os.system('clear')
+                    os.system('clear')
                     self.searchItem(item_name)
-                    
+                    print('='*50)
                 elif sel == '2':
 
                     AGAIN = 0
                 else:
                     print('잘못 입력하셨습니다.')
-            # for name in INVENTORY:        
-            #     item = item_instance.LoadItem(name)  # get_status 호출
-                
-            #     item_name = item.get('name', '')
-            #     item_description = item.get('description', '')
-                
-            #     item_stat = item.get('stat', 0)
-            #     item_required_class = item.get('required_class', [])
-            #     item_required_stat = item.get('required_stat', [])
-                
-            #     item_attack_score = item.get('attack_score', 0)
-            #     item_defense_score = item.get('defense_score', 0)
             
     # 가지고 있는 아이템 상세보기
     def searchItem(self, item_name):

@@ -31,9 +31,9 @@ class Item():
         # 데이터 비어있거나 파일이 없음
         if not os.path.exists(save_file_path) or os.path.getsize(save_file_path) == 0:
             with open('saves/datas/item_data.json', 'w', encoding='utf-8') as f:
-                json.dump([], f, indent=4)
+                json.dump({}, f, indent=4)
             
-            ItemDataBase = []
+            ItemDataBase = {}
         else:
             with open('saves/datas/item_data.json', 'r', encoding='utf-8') as f:
                 ItemDataBase = json.load(f)
@@ -44,12 +44,9 @@ class Item():
     def LoadItem(self, item_name):
         ItemDataBase = self.LoadItemDataBase()
         
-        # 딕셔너리로 변환
-        item_dict = {item["name"]: item for item in ItemDataBase}
-        
         # 빠른 검색
-        if item_name in item_dict:
-            item = item_dict[item_name]
+        if item_name in ItemDataBase:
+            item = ItemDataBase[item_name]
             
             ItemData = {
                 "name": item['name'],
@@ -65,7 +62,6 @@ class Item():
         else:
             print(f"Item '{item_name}' not found.")
         
-            
         return ItemData
     
     def ItemDisplay(self):
@@ -74,51 +70,44 @@ class Item():
     
     # 아이템 출력하기 (1개)
     def ItemDisplayOne(self, name):
-        item = self.LoadItem(name)
-        # item_df = pd.DataFrame(index=range(16), columns=range(1))
+        item_data = self.LoadItem(name)
         
-        data = {
-            "아이템 이름": item['name'],
-            "설명": item['description'],
-            "스텟": item['stat'],
-            "착용 가능 클래스": item['required_class'],
-            "요구 스텟": item['required_stat'],
-            "공격력": item['attack_score'],
-            "방어력": item['defense_score'],
-            "드랍확률": item['drop']
-        }
+        # 데이터를 변환하여 출력 형태를 조정
+        stat_lines = [f"{key} {value}" for key, value in item_data["stat"][0].items()]
+        stat_text = "\n".join(stat_lines)
         
-        # for idx, (key, value) in enumerate(data.items()):
-        #     row = 1
-        #     item_df.iloc[idx, 0] = key
-        #     item_df.iloc[idx, 0] = value
-        #     row += 1
+        required_stat_lines = [f"{key} {value}" for key, value in item_data["required_stat"][0].items()]
+        required_stat_text = "\n".join(required_stat_lines)
         
-        # item_df.fillna('', inplace=True)
-        # print(tabulate(item_df, tablefmt='plain', showindex=False, headers=[]), '\n')
+        # 착용 가능 클래스를 줄바꿈으로 변환
+        required_class_text = "\n".join(item_data["required_class"])
         
-        for key, value in data.items():
-            if type(value) == "dict":
-                print(f"{key}", end='')
-                for item_key, item_value in value.items():
-                    print(f"{item_key}\t{item_value}", end=', ')
-                print()
-            elif type(value) == 'list':
-                print(f"{key}", end='')
-                for ch_class in value:
-                    print(ch_class, end=', ')
-                print()
-            else:
-                if type(value) == 'list':
-                    print(f"{key}\t{value[0]}")
-                else:
-                    print(f"{key}\t{value}")
+        # 출력용 테이블 데이터
+        table_data = [
+            ["아이템 이름", item_data["name"]],
+            ["설명", item_data["description"]],
+            ["스텟", stat_text],
+            ["착용 가능 클래스", required_class_text],
+            ["요구 스텟", required_stat_text],
+            ["공격력", item_data["attack_score"]],
+            ["방어력", item_data["defense_score"]],
+            ["드랍확률", item_data.get("drop_chance", 0)],
+        ]
+        
+        # 출력
+        print(tabulate(table_data, tablefmt="plain", colalign=("left", "left")))
     
     # 아이템 추가하기
     def AddItem(self, data):
         ItemData = self.LoadItemDataBase()
         
-        item_data = {
+        # 중복 확인
+        if data['name'] in ItemData:
+            print(f"Item '{data['name']}' already exists.")
+            return  # 중복된 아이템은 추가하지 않음
+        
+        # 새로운 데이터
+        ItemData[data['name']] = {
             "name": data['name'],
             "description": data['description'],
             
@@ -131,6 +120,5 @@ class Item():
             "drop": data['drop']
         }
         
-        ItemData.append(item_data)
         with open('saves/datas/item_data.json', 'w', encoding='utf-8') as f:
             json.dump(ItemData, f, indent=4)
