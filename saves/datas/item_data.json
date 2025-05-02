@@ -2,24 +2,20 @@
     {
         "name": "\ucca0 \uac80",
         "description": "\ub2e8\ub2e8\ud55c \ucca0 \uac80\uc774\ub2e4.",
-        "stat": [
-            {
-                "STR": 0,
-                "AGI": 0,
-                "INI": 0,
-                "LUCK": 0
-            }
-        ],
+        "stat": {
+            "STR": 0,
+            "AGI": 0,
+            "INI": 0,
+            "LUCK": 0
+        },
         "required_class": [
             "\uc804\uc0ac"
         ],
-        "required_stat": [
-            {
-                "STR": 15,
-                "AGI": 0,
-                "INT": 0
-            }
-        ],
+        "required_stat": {
+            "STR": 15,
+            "AGI": 0,
+            "INT": 0
+        },
         "attack_score": 50,
         "defense_score": 0
     }

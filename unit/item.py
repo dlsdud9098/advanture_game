@@ -1,5 +1,5 @@
 import pandas as pd
-import tabulate
+from tabulate import tabulate
 import os
 import json
 
@@ -45,30 +45,56 @@ class Item():
         # 딕셔너리로 변환
         item_dict = {item["name"]: item for item in ItemDataBase}
         
-        print(item_dict)
+        # 빠른 검색
+        if item_name in item_dict:
+            item = item_dict[item_name]
             
+            ItemData = {
+                "name": item['name'],
+                "description": item['description'],
+                "stat": item['stat'],
+                "required_class": item['required_class'],
+                "required_stat": item['required_stat'],
+                "attack_score": item['attack_score'],
+                "defense_score": item['defense_score']
+            }
+            
+        else:
+            print(f"Item '{item_name}' not found.")
+        
+            
+        return ItemData
+    
+    def ItemDisplay(self):
+        ItemDataBase = self.LoadItemDataBase()
         pass
     
     # 아이템 출력하기 (1개)
-    def ItemDisplay(self):
+    def ItemDisplayOne(self, name):
+        item = self.LoadItem(name)
         item_df = pd.DataFrame(index=range(16), columns=range(1))
         
         data = {
-            "아이템 이름": self.name,
-            "설명": self.description,
-            "스텟": self.stat,
-            "착용 가능 클래스": self.required_class,
-            "요구 스텟": self.required_stat,
-            "공격력": self.attack_score,
-            "방어력": self.defense_score
+            "아이템 이름": item['name'],
+            "설명": item['description'],
+            "스텟": item['stat'],
+            "착용 가능 클래스": item['required_class'],
+            "요구 스텟": item['required_stat'],
+            "공격력": item['attack_score'],
+            "방어력": item['defense_score'],
         }
         
-        for idx, (key, value) in enumerate(data.items()):
-            item_df.iloc[idx, 0] = key
-            item_df.iloc[idx+1, 0] = value
+        # for idx, (key, value) in enumerate(data.items()):
+        #     row = 1
+        #     item_df.iloc[idx, 0] = key
+        #     item_df.iloc[idx, 0] = value
+        #     row += 1
         
-        item_df.fillna('', inplace=True)
-        print(tabulate(item_df, tablefmt='plain', showindex=False, headers=[]), '\n')
+        # item_df.fillna('', inplace=True)
+        # print(tabulate(item_df, tablefmt='plain', showindex=False, headers=[]), '\n')
+        
+        for key, value in data.items():
+            print(f"{key}\t{value}")
     
     # 아이템 추가하기
     def AddItem(self, data):
