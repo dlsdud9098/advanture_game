@@ -31,7 +31,6 @@ class SAVE_LOADS:
             player_datas.append(data)
         else:
             names = [player['name'] for player in player_datas]
-            print(data['name'], names)
             if data['name'] in names:
                 print('중복된 이름입니다.')
                 return 1

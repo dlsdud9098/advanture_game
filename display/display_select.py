@@ -20,10 +20,42 @@ def select_charater_display():
         CLASS = '마법사'
     
     return name, CLASS
-def Display():
+
+def NewGameDisplay(svld):
+    name, CLASS = select_charater_display()
+    player = Player(name=name, CLASS = CLASS)
+    
+    data = player.status()
+    SAMENAME = svld.data_update(data)
+    
+    return SAMENAME
+
+def LoadGameDisplay(player_data):
     os.system('clear')
+    for idx, data in enumerate(player_data):
+        print(f"{idx+1}. LV: {data['LV']}, name: {data['name']}")
+        
+    player_idx = input('불러올 데이터 선택')
+    if not player_idx.isdigit():
+        print('잘못 입력하셨습니다.')
+    player_idx = int(player_idx) - 1
+    
+    if player_idx > len(player_data) or (player_idx < 0):
+        print('리스트에 없습니다.')
+        
+    print(player_data[player_idx])
+    player = Player(name='', CLASS='')
+    player.set_status(player_data[player_idx])
+    
+    player.DisplayStatus()
+    AGAIN = 0
+
+def MainDisplay():
+    os.system('clear')
+    
     svld = SAVE_LOADS()
     SAMENAME = 1
+    
     while (SAMENAME):
         print('='*15)
         print('1. New Game')
@@ -32,39 +64,17 @@ def Display():
         print('='*15)
         
         sel = input()
+        print(sel)
         if sel == '1':
-            name, CLASS = select_charater_display()
-            player = Player(name=name, CLASS = CLASS)
-            
-            data = player.status()
-            SAMENAME = svld.data_update(data)
+            SAMENAME = NewGameDisplay(svld)
         elif sel == '2':
             player_data = svld.data_load()
-            
             if not bool(player_data):
                 SAMENAME = 1
             else:
                 AGAIN = 1
                 while (AGAIN):
-                    os.system('clear')
-                    for idx, data in enumerate(player_data):
-                        print(f"{idx+1}. LV: {data['LV']}, name: {data['name']}")
-                        
-                    player_idx = input('불러올 데이터 선택')
-                    if not player_idx.isdigit():
-                        print('잘못 입력하셨습니다.')
-                    player_idx = int(player_idx) - 1
-                    
-                    if player_idx > len(player_data) or (player_idx < 0):
-                        print('리스트에 없습니다.')
-                        
-                    print(player_data[player_idx])
-                    player = Player(name='', CLASS='')
-                    player.set_status(player_data[player_idx])
-                    
-                    player.DisplayStatus()
-                    AGAIN = 0
-
+                    LoadGameDisplay(player_data)
         elif sel == '3':
             print('종료')
             return 
