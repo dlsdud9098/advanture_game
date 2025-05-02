@@ -4,6 +4,7 @@ import os
 
 from tabulate import tabulate
 import pandas as pd
+import time
 
 class Player():
     def __init__(self, **kwargs):
@@ -155,6 +156,7 @@ class Player():
         self.CLASS = data['CLASS']
         self.name = data['name']
         
+    # 상태창 열기
     def DisplayStatus(self):
         os.system('clear')
         
@@ -210,8 +212,10 @@ class Player():
             self.ViewInventory()
         else:
             print('잘못 입력하셨습니다.')
-        
+    
+    # 인벤토리 보기
     def ViewInventory(self):
+        # os.system('clear')
         INVENTORY = self.inventory
         
         ch_class = 'item'
@@ -219,12 +223,28 @@ class Player():
         class_module = f"unit.{ch_class}"
         module = importlib.import_module(class_module)
     
-    
         if hasattr(module, 'Item'):
             item_class = getattr(module, 'Item')  # Warrior 클래스를 가져옴
             item_instance = item_class()  # Warrior 인스턴스를 생성
             
-            item_instance.LoadItem(INVENTORY[0])
+            ItemDataBase = item_instance.LoadItemDataBase()
+            ItemList = [itemlist['name'] for itemlist in ItemDataBase]
+            
+            print(f"아이템 목록: {ItemList}")
+            AGAIN = 1
+            while AGAIN:
+                sel = input('1. 아이템 상세보기\n2. 뒤로가기')
+                
+                if sel == '1':
+                    item_name = input('찾는 아이템: ')
+                    # os.system('clear')
+                    self.searchItem(item_name)
+                    
+                elif sel == '2':
+
+                    AGAIN = 0
+                else:
+                    print('잘못 입력하셨습니다.')
             # for name in INVENTORY:        
             #     item = item_instance.LoadItem(name)  # get_status 호출
                 
@@ -237,4 +257,17 @@ class Player():
                 
             #     item_attack_score = item.get('attack_score', 0)
             #     item_defense_score = item.get('defense_score', 0)
+            
+    # 가지고 있는 아이템 상세보기
+    def searchItem(self, item_name):
+        ch_class = 'item'
+        # 동적으로 character_class 모듈 불러오기
+        class_module = f"unit.{ch_class}"
+        module = importlib.import_module(class_module)
+    
+        if hasattr(module, 'Item'):
+            item_class = getattr(module, 'Item')  # Warrior 클래스를 가져옴
+            item_instance = item_class()  # Warrior 인스턴스를 생성
+            
+            item_instance.ItemDisplayOne(item_name)
             

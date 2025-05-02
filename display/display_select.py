@@ -1,5 +1,6 @@
 from unit.player import Player
 from saves.save_loads import SAVE_LOADS
+# from game.main_game import MAIN_GAME
 import os
 
 def select_charater_display():
@@ -46,11 +47,11 @@ def LoadGameDisplay(player_data):
     if player_idx > len(player_data) or (player_idx < 0):
         print('리스트에 없습니다.')
         
-    print(player_data[player_idx])
+    # print(player_data[player_idx])
     player = Player(name='', CLASS='')
     player.set_status(player_data[player_idx])
     
-    player.DisplayStatus()
+    # player.DisplayStatus()
     return 0, player
     
 
@@ -90,4 +91,6 @@ def MainDisplay():
             print('잘못 입력하셨습니다.')
             os.system('clear')
             
-        # GameStart(player)
+    return player
+        # main = MAIN_GAME()
+        # main.MENU(player)

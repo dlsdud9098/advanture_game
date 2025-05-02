@@ -6,7 +6,7 @@ import json
 class Item():
     def __init__(self, name = None, description = None, \
                 required_class = None, required_stat = None, \
-                attack = None, defense = None, stat = None):
+                attack = None, defense = None, stat = None, drop = None):
         
         self.name = name
         self.description = description
@@ -17,6 +17,8 @@ class Item():
         
         self.attack_score = attack
         self.defense_score = defense
+        
+        self.drop = drop
         
     
     def UseItem(self):
@@ -56,7 +58,8 @@ class Item():
                 "required_class": item['required_class'],
                 "required_stat": item['required_stat'],
                 "attack_score": item['attack_score'],
-                "defense_score": item['defense_score']
+                "defense_score": item['defense_score'],
+                'drop': item['drop']
             }
             
         else:
@@ -72,7 +75,7 @@ class Item():
     # 아이템 출력하기 (1개)
     def ItemDisplayOne(self, name):
         item = self.LoadItem(name)
-        item_df = pd.DataFrame(index=range(16), columns=range(1))
+        # item_df = pd.DataFrame(index=range(16), columns=range(1))
         
         data = {
             "아이템 이름": item['name'],
@@ -82,6 +85,7 @@ class Item():
             "요구 스텟": item['required_stat'],
             "공격력": item['attack_score'],
             "방어력": item['defense_score'],
+            "드랍확률": item['drop']
         }
         
         # for idx, (key, value) in enumerate(data.items()):
@@ -94,13 +98,27 @@ class Item():
         # print(tabulate(item_df, tablefmt='plain', showindex=False, headers=[]), '\n')
         
         for key, value in data.items():
-            print(f"{key}\t{value}")
+            if type(value) == "dict":
+                print(f"{key}", end='')
+                for item_key, item_value in value.items():
+                    print(f"{item_key}\t{item_value}", end=', ')
+                print()
+            elif type(value) == 'list':
+                print(f"{key}", end='')
+                for ch_class in value:
+                    print(ch_class, end=', ')
+                print()
+            else:
+                if type(value) == 'list':
+                    print(f"{key}\t{value[0]}")
+                else:
+                    print(f"{key}\t{value}")
     
     # 아이템 추가하기
     def AddItem(self, data):
         ItemData = self.LoadItemDataBase()
         
-        data = {
+        item_data = {
             "name": data['name'],
             "description": data['description'],
             
@@ -109,9 +127,10 @@ class Item():
             "required_stat": data['required_stat'],
             
             "attack_score": data['attack_score'],
-            "defense_score": data['defense_score']
+            "defense_score": data['defense_score'],
+            "drop": data['drop']
         }
         
-        ItemData.append(data)
+        ItemData.append(item_data)
         with open('saves/datas/item_data.json', 'w', encoding='utf-8') as f:
             json.dump(ItemData, f, indent=4)

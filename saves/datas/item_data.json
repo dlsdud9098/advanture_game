@@ -17,6 +17,7 @@
             "INT": 0
         },
         "attack_score": 50,
-        "defense_score": 0
+        "defense_score": 0,
+        "drop": 0
     }
 ]
