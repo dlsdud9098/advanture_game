@@ -6,7 +6,7 @@ class SAVE_LOADS:
         save_file_path = 'saves/datas/saves.json'
         # 데이터 비어있거나 파일이 없음
         if not os.path.exists(save_file_path) or os.path.getsize(save_file_path) == 0:
-            with open('saves/datas/saves.json', 'w', encoding='utf-8') as f:
+            with open(save_file_path, 'w', encoding='utf-8') as f:
                 json.dump({}, f, indent=4)
     
     # 데이터 저장하기

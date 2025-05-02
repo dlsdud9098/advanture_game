@@ -1,4 +1,7 @@
-class Monster():
+import os
+import json
+
+class Monster:
     def __init__(self, args):
         self.mp = args['mp']                        # 개체의 마력
         self.hp = args['hp']                        # 개체의 체력
@@ -27,8 +30,15 @@ class Monster():
     def use_skill(self):
         pass
     
-    # 무기 교체하기
-    def change_weapon(self):
+    # 몬스터 DB
+    def MonsterDB(self):
+        save_file_path = 'saves/datas/monster_data.json'
+        # 데이터 비어있거나 파일이 없음
+        if not os.path.exists(save_file_path) or os.path.getsize(save_file_path) == 0:
+            with open(save_file_path, 'w', encoding='utf-8') as f:
+                json.dump({}, f, indent=4)
         pass
     
-    
+    # 몬스터 추가
+    def AddMonsterData(self):
+        pass

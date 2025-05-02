@@ -6,7 +6,7 @@
         "defense_score": 10,
         "skills": [],
         "inventory": [
-            "\ucca0 \uac80"
+            "\ucca0 \uac80", "\ucca0 \uac802"
         ],
         "use_items": [],
         "unit_type": "Player",

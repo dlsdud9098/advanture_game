@@ -6,6 +6,8 @@ from tabulate import tabulate
 import pandas as pd
 import time
 
+from unit.item import Item
+
 class Player():
     def __init__(self, **kwargs):
         self.mp = 100                       # 개체의 마력
@@ -14,7 +16,7 @@ class Player():
         self.defense_score = 5              # 개체의 방어력
         self.skills = []                    # 개체의 스킬
         self.inventory = ['철 검']                 # 개체가 소지하고 있는 아이템
-        self.use_items = []                 # 착용하고 있는 아이템
+        self.user_armor = []                 # 착용하고 있는 아이템
         self.unit_type = 'Player'           # 개체 타입(몬스터, 유닛, npc 등)
         self.money = 1000                   # 개체가 소지하고 있는 골드(또는 드랍하는 골드)
         self.STR = 10                       # 개체의 힘 (공격력, 체력)
@@ -86,18 +88,6 @@ class Player():
     # 소지하고 있는 골드
     def how_money(self):
         print(f"Gold: {self.money}")
-        pass
-    
-    # 소지품
-    def bag(self):
-        pass
-    
-    # 행동
-    def behavior(self):
-        pass
-    
-    # 클래스 선택
-    def select_class(self):
         pass
     
     # 경험치 바
@@ -207,7 +197,7 @@ class Player():
         sel = input(f"1. 장비 보기\n2. 인벤토리 보기\n{'='*50}\n")
         
         if sel == '1':
-            pass
+            self.use_armor()
         elif sel == '2':
             self.ViewInventory()
         else:
@@ -218,44 +208,61 @@ class Player():
         # os.system('clear')
         INVENTORY = self.inventory
         
-        ch_class = 'item'
-        # 동적으로 character_class 모듈 불러오기
-        class_module = f"unit.{ch_class}"
-        module = importlib.import_module(class_module)
-    
-        if hasattr(module, 'Item'):
-            item_class = getattr(module, 'Item')  # Warrior 클래스를 가져옴
-            item_instance = item_class()  # Warrior 인스턴스를 생성
+        item = Item()
+        ItemDataBase = item.LoadItemDataBase()
+        ItemList = [item for item in ItemDataBase.keys()]
+        
+        
+        print(f"아이템 목록: {ItemList}")
+        AGAIN = 1
+        while AGAIN:
+            sel = input('1. 아이템 상세보기\n2. 아이템 장착하기\n3. 뒤로가기')
             
-            ItemDataBase = item_instance.LoadItemDataBase()
-            ItemList = [itemlist['name'] for itemlist in ItemDataBase]
-            
-            print(f"아이템 목록: {ItemList}")
-            AGAIN = 1
-            while AGAIN:
-                sel = input('1. 아이템 상세보기\n2. 뒤로가기')
-                
-                if sel == '1':
-                    item_name = input('찾는 아이템: ')
-                    os.system('clear')
-                    self.searchItem(item_name)
-                    print('='*50)
-                elif sel == '2':
-
-                    AGAIN = 0
-                else:
-                    print('잘못 입력하셨습니다.')
+            if sel == '1':
+                item_name = input('찾는 아이템: ')
+                os.system('clear')
+                self.DisplayItem(item_name)
+                print('='*50)
+            elif sel == '2':
+                item_name = input('장착하고자 하는 아이템: ')
+                self.EquipItem(item_name)
+                AGAIN = 0
+            elif sel == '3':
+                AGAIN = 0
+            else:
+                print('잘못 입력하셨습니다.')
             
     # 가지고 있는 아이템 상세보기
-    def searchItem(self, item_name):
-        ch_class = 'item'
-        # 동적으로 character_class 모듈 불러오기
-        class_module = f"unit.{ch_class}"
-        module = importlib.import_module(class_module)
-    
-        if hasattr(module, 'Item'):
-            item_class = getattr(module, 'Item')  # Warrior 클래스를 가져옴
-            item_instance = item_class()  # Warrior 인스턴스를 생성
+    def DisplayItem(self, item_name):
+        item = Item()
+        item.ItemDisplayOne(item_name)
+        
+
+    # 현재 착용하고 있는 아이템
+    def use_armor(self):
+        itemClass = Item()
+        ItemDataBase = itemClass.LoadItemDataBase()
+
+        armor = {
+            '투구': '',
+            '목걸이': '',
+            '반지': [],
+            '갑옷': '',
+            '바지': '',
+            '신발': '',
+            '무기': ''
+        }
+        for item in self.user_armor:
+            item_data = ItemDataBase[item]
             
-            item_instance.ItemDisplayOne(item_name)
-            
+            # 부위
+            item_type = item_data['type']
+            if item_type == '반지':
+                armor[item_type].append(item_data['name'])
+            else:
+                armor[item_type] = item_data['name']
+                
+        print(armor)
+
+    def EquipItem(self, item_name):
+        pass

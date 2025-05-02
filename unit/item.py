@@ -30,7 +30,7 @@ class Item():
         save_file_path = 'saves/datas/item_data.json'
         # 데이터 비어있거나 파일이 없음
         if not os.path.exists(save_file_path) or os.path.getsize(save_file_path) == 0:
-            with open('saves/datas/item_data.json', 'w', encoding='utf-8') as f:
+            with open(save_file_path, 'w', encoding='utf-8') as f:
                 json.dump({}, f, indent=4)
             
             ItemDataBase = {}
@@ -48,19 +48,13 @@ class Item():
         if item_name in ItemDataBase:
             item = ItemDataBase[item_name]
             
-            ItemData = {
-                "name": item['name'],
-                "description": item['description'],
-                "stat": item['stat'],
-                "required_class": item['required_class'],
-                "required_stat": item['required_stat'],
-                "attack_score": item['attack_score'],
-                "defense_score": item['defense_score'],
-                'drop': item['drop']
-            }
+            ItemData = {}
+            for key, value in item.items():
+                ItemData[key] = value
             
         else:
             print(f"Item '{item_name}' not found.")
+            return 0
         
         return ItemData
     
@@ -71,6 +65,9 @@ class Item():
     # 아이템 출력하기 (1개)
     def ItemDisplayOne(self, name):
         item_data = self.LoadItem(name)
+        
+        if item_data == 0:
+            return 
         
         # 데이터를 변환하여 출력 형태를 조정
         stat_lines = [f"{key} {value}" for key, value in item_data["stat"][0].items()]
@@ -92,7 +89,9 @@ class Item():
             ["공격력", item_data["attack_score"]],
             ["방어력", item_data["defense_score"]],
             ["드랍확률", item_data.get("drop_chance", 0)],
+            ["부위", item_data.get('type', 0)]
         ]
+        
         
         # 출력
         print(tabulate(table_data, tablefmt="plain", colalign=("left", "left")))
@@ -107,18 +106,9 @@ class Item():
             return  # 중복된 아이템은 추가하지 않음
         
         # 새로운 데이터
-        ItemData[data['name']] = {
-            "name": data['name'],
-            "description": data['description'],
-            
-            "stat": data['stat'],
-            "required_class": data['required_class'],
-            "required_stat": data['required_stat'],
-            
-            "attack_score": data['attack_score'],
-            "defense_score": data['defense_score'],
-            "drop": data['drop']
-        }
+        ItemData[data['name']] = {}
+        for key, value in data.items():
+            ItemData[data['name']][key] = value
         
         with open('saves/datas/item_data.json', 'w', encoding='utf-8') as f:
             json.dump(ItemData, f, indent=4)
