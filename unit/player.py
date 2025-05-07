@@ -6,7 +6,6 @@ from itertools import chain
 
 from tabulate import tabulate
 import pandas as pd
-import time
 
 from unit.item import Item
 
@@ -15,6 +14,7 @@ if os_name == "Windows":
     clear_language = "cls"
 else:
     clear_language = "clear"
+    
 class Player():
     global clear_language
         
@@ -59,7 +59,6 @@ class Player():
             # 동적으로 character_class 모듈 불러오기
             class_module = f"unit.character_class.{ch_class}"
             module = importlib.import_module(class_module)
-        
         
             if hasattr(module, 'Warrior'):
                 warrior_class = getattr(module, 'Warrior')  # Warrior 클래스를 가져옴
@@ -275,24 +274,31 @@ class Player():
 
         print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]), '\n')
         
-        self.ViewInventory(1)
-        sel = input("1. 장비 장착하기\n2. 장착 해제하기\n3. 뒤로가기")
-        TempFunc = {"1": self.EquipItem, "2": self.UnEquipItem}
-        
-        # while True:
-        if sel == '3':
-            return
-        elif sel in TempFunc.keys():
-            TempFunc[sel]()
-        else:
-            print('잘못 입력하셨습니다.')
+        if not q:
+            sel = input("1. 장비 장착하기\n2. 장착 해제하기\n3. 뒤로가기")
+            TempFunc = {"1": self.EquipItem, "2": self.UnEquipItem}
+            
+            if sel == '3':
+                return
+            elif sel in TempFunc.keys():
+                TempFunc[sel]()
+            else:
+                print('잘못 입력하셨습니다.')
 
     # 장비 장착하기
     def EquipItem(self):
+        self.ViewArmor(1)
+        item = Item()
+        print('장착 가능한 아이템 목록: ', end='')
+        for item_name in self.inventory:
+            Item_data = item.LoadItem(item_name)
+            if Item_data['type'] in ['투구', '반지', '목걸이', '갑옷', '바지', '신발', '무기']:
+                print(Item_data['name']+",", end=' ')
+        print()
+        
         item_name = input('장착할 아이템 이름(취소:0): ')
         if item_name == '0':
             return
-        item = Item()
         Item_data = item.LoadItem(item_name)
         
         # 아이템 타입
@@ -302,21 +308,19 @@ class Player():
             # 장착
             self.armor[Item_data['type']] = Item_data['name']
             print(f"{Item_data['name']}을(를) 장착하였습니다.")
-            print(self.inventory)
             self.inventory.remove(Item_data['name'])       # 장착 했으니 인벤토리에서 삭제
-        
-        self.ViewArmor()
-        print(self.inventory)
+
         
     # 장비 장착 해제(self):
     def UnEquipItem(self):
-        self.armor_list = [item for sublist in self.armor.values() for item in (sublist if isinstance(sublist, list) else [sublist])]
+        self.armor_list = [item for sublist in self.armor.values() for item in (sublist if isinstance(sublist, list) else [sublist]) if item != '없음']
 
-        print(self.armor.values())
+        self.ViewArmor(1)
+        
         item_name = input('장착 해제할 장비 이름을 입력하세요(취소:0): ')
         if item_name == '0':
             return
-        print(self.armor_list)
+        
         if item_name in self.armor_list:
             if len(self.inventory) + 1 > self.max_inventory:
                 print('인벤토리가 가득 찼습니다. 비워주세요.')
@@ -324,6 +328,7 @@ class Player():
             else:
                 item = Item()
                 Item_data = item.LoadItem(item_name)
+                print(f"{Item_data['name']}을(를) 해제하셨습니다.")
                 
                 self.armor[Item_data['type']] = '없음'
                 self.inventory.append(Item_data['name'])

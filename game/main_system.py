@@ -14,6 +14,8 @@ class MAIN_GAME:
         
         while (True):
             sel = input(f"{'='*50}\n1. 상태창\n2. 진행하기\n3. 저장하기\n4. 뒤로가기\n{'='*50}")
+            
+            TempFunc = {"1": player.DisplayStatus, "2": '', "3": ''}
             if sel == '1':
                 player.DisplayStatus()
             elif sel == '2':
