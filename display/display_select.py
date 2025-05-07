@@ -1,10 +1,16 @@
 from unit.player import Player
 from saves.save_loads import SAVE_LOADS
-# from game.main_game import MAIN_GAME
 import os
+import platform
 
+os_name = platform.system()
+if os_name == "Windows":
+    clear_language = "cls"
+else:
+    clear_language = "clear"
+    
 def select_charater_display():
-    os.system('clear')
+    os.system(clear_language)
     print('='*50)
     name = input('캐릭터 이름을 입력해주세요')
     CLASS = input(
@@ -35,7 +41,7 @@ def NewGameDisplay(svld):
     return SAMENAME, player
 
 def LoadGameDisplay(player_data):
-    os.system('clear')
+    os.system(clear_language)
     for idx, data in enumerate(player_data):
         print(f"{idx+1}. LV: {data['LV']}, name: {data['name']}")
         
@@ -47,16 +53,14 @@ def LoadGameDisplay(player_data):
     if player_idx > len(player_data) or (player_idx < 0):
         print('리스트에 없습니다.')
         
-    # print(player_data[player_idx])
     player = Player(name='', CLASS='')
     player.set_status(player_data[player_idx])
     
-    # player.DisplayStatus()
     return 0, player
     
 
 def MainDisplay():
-    os.system('clear')
+    os.system(clear_language)
     
     svld = SAVE_LOADS()
     SAMENAME = 1
@@ -75,7 +79,7 @@ def MainDisplay():
         elif sel == '2':
             player_data = svld.data_load()
             if not bool(player_data):
-                os.system('clear')
+                os.system(clear_language)
                 print('데이터가 비어있습니다.')
                 SAMENAME = 1
             else:
@@ -85,12 +89,10 @@ def MainDisplay():
                 break
         elif sel == '3':
             print('종료')
-            os.system('clear')
+            os.system(clear_language)
             return 
         else:
             print('잘못 입력하셨습니다.')
-            os.system('clear')
+            os.system(clear_language)
             
     return player
-        # main = MAIN_GAME()
-        # main.MENU(player)

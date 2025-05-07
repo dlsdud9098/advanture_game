@@ -1,6 +1,8 @@
 import random
 import importlib
 import os
+import platform
+from itertools import chain
 
 from tabulate import tabulate
 import pandas as pd
@@ -8,15 +10,21 @@ import time
 
 from unit.item import Item
 
+os_name = platform.system()
+if os_name == "Windows":
+    clear_language = "cls"
+else:
+    clear_language = "clear"
 class Player():
+    global clear_language
+        
     def __init__(self, **kwargs):
         self.mp = 100                       # 개체의 마력
         self.hp = 100                       # 개체의 체력
         self.attack_score = 10              # 개체의 공격력
         self.defense_score = 5              # 개체의 방어력
         self.skills = []                    # 개체의 스킬
-        self.inventory = ['철 검']                 # 개체가 소지하고 있는 아이템
-        self.user_armor = []                 # 착용하고 있는 아이템
+        self.inventory = []                 # 개체가 소지하고 있는 아이템
         self.unit_type = 'Player'           # 개체 타입(몬스터, 유닛, npc 등)
         self.money = 1000                   # 개체가 소지하고 있는 골드(또는 드랍하는 골드)
         self.STR = 10                       # 개체의 힘 (공격력, 체력)
@@ -31,6 +39,17 @@ class Player():
         self.CLASS = kwargs['CLASS']        # 직업
         self.name = kwargs['name']          # 개체 이름
         self.max_inventory = 10             # 최대 인벤토리 크기
+        self.armor_list = []
+        
+        self.armor = {                      # 현재 착용하고 있는 장비
+            '투구': '없음',
+            '목걸이': '없음',
+            '반지': ['없음', '없음'],
+            '갑옷': '없음',
+            '바지': '없음',
+            '신발': '없음',
+            '무기': '없음'
+        }
         
         self.init_status()                  # 캐릭터 만들기
         
@@ -148,7 +167,7 @@ class Player():
         
     # 상태창 열기
     def DisplayStatus(self):
-        os.system('clear')
+        os.system(clear_language)
         
         # 빈 DataFrame 생성: 4열로 생성
         display_status = pd.DataFrame(index=range(7), columns=range(4))
@@ -165,9 +184,6 @@ class Player():
             "INT": self.INT
         }
         
-        # for idx, (key, value) in enumerate(data.items()):
-        #     display_status.iloc[idx, idx] = key
-        #     display_status.iloc[idx, idx+1] = value
         # 데이터 추가
         display_status.iloc[0, 0] = "Level"
         display_status.iloc[0, 1] = self.LV
@@ -193,76 +209,124 @@ class Player():
 
         print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]), '\n')
         
-        # print(tabulate(display_status, tablefmt='grid', showindex=False, headers=[]), '\n')
-        sel = input(f"1. 장비 보기\n2. 인벤토리 보기\n{'='*50}\n")
-        
-        if sel == '1':
-            self.use_armor()
-        elif sel == '2':
-            self.ViewInventory()
-        else:
-            print('잘못 입력하셨습니다.')
-    
-    # 인벤토리 보기
-    def ViewInventory(self):
-        # os.system('clear')
-        INVENTORY = self.inventory
-        
-        item = Item()
-        ItemDataBase = item.LoadItemDataBase()
-        ItemList = [item for item in ItemDataBase.keys()]
-        
-        
-        print(f"아이템 목록: {ItemList}")
-        AGAIN = 1
-        while AGAIN:
-            sel = input('1. 아이템 상세보기\n2. 아이템 장착하기\n3. 뒤로가기')
-            
-            if sel == '1':
-                item_name = input('찾는 아이템: ')
-                os.system('clear')
-                self.DisplayItem(item_name)
-                print('='*50)
-            elif sel == '2':
-                item_name = input('장착하고자 하는 아이템: ')
-                self.EquipItem(item_name)
-                AGAIN = 0
-            elif sel == '3':
-                AGAIN = 0
+        ViewFunc = {"1": self.ViewArmor, "2": self.ViewInventory}
+        while (True):
+            sel = input(f"1. 장비 보기\n2. 인벤토리 보기\n3. 뒤로가기\n{'='*50}\n")
+            if sel == "3":
+                break
+            if sel in ViewFunc.keys():
+                ViewFunc[sel]()
             else:
                 print('잘못 입력하셨습니다.')
+    
+    # 인벤토리 보기
+    def ViewInventory(self, q = None):
+        # os.system(clear_language)
+        
+        print(f"아이템 목록: {self.inventory}")
+        
+        if not q:
+            
+            while (True):
+                sel = input('1. 아이템 검색하기\n2. 뒤로가기')
+                if sel == '2':
+                    break
+                elif sel == '1':
+                    item_name = input('아이템 이름: ')
+                    self.DisplayItem(item_name)
+                else:
+                    print('잘못 입력하셨습니다.')
             
     # 가지고 있는 아이템 상세보기
     def DisplayItem(self, item_name):
         item = Item()
         item.ItemDisplayOne(item_name)
         
-
     # 현재 착용하고 있는 아이템
-    def use_armor(self):
-        itemClass = Item()
-        ItemDataBase = itemClass.LoadItemDataBase()
+    def ViewArmor(self, q=None):
+        os.system(clear_language)
+        
+        # 빈 DataFrame 생성: 3열로 생성
+        display_status = pd.DataFrame(index=range(10), columns=range(3))
+        
+        # 데이터 추가
+        display_status.iloc[1, 0] = ""
+        display_status.iloc[1, 1] = self.armor['투구']
+        display_status.iloc[1, 2] = ""
+        
+        display_status.iloc[3, 0] = ""
+        display_status.iloc[3, 1] = self.armor['목걸이']
+        display_status.iloc[3, 2] = ""
+        
+        display_status.iloc[5, 0] = self.armor['반지'][0]
+        display_status.iloc[5, 1] = self.armor['갑옷']
+        display_status.iloc[5, 2] = self.armor['반지'][1]
+        
+        display_status.iloc[7, 0] = ""
+        display_status.iloc[7, 1] = self.armor['바지']
+        display_status.iloc[7, 2] = ""
+        
+        display_status.iloc[9, 0] = ""
+        display_status.iloc[9, 1] = self.armor['신발']
+        display_status.iloc[9, 2] = ""
+        
+        display_status.fillna('', inplace=True)
+        
 
-        armor = {
-            '투구': '',
-            '목걸이': '',
-            '반지': [],
-            '갑옷': '',
-            '바지': '',
-            '신발': '',
-            '무기': ''
-        }
-        for item in self.user_armor:
-            item_data = ItemDataBase[item]
-            
-            # 부위
-            item_type = item_data['type']
-            if item_type == '반지':
-                armor[item_type].append(item_data['name'])
+        print(tabulate(display_status, tablefmt='plain', showindex=False, headers=[]), '\n')
+        
+        self.ViewInventory(1)
+        sel = input("1. 장비 장착하기\n2. 장착 해제하기\n3. 뒤로가기")
+        TempFunc = {"1": self.EquipItem, "2": self.UnEquipItem}
+        
+        # while True:
+        if sel == '3':
+            return
+        elif sel in TempFunc.keys():
+            TempFunc[sel]()
+        else:
+            print('잘못 입력하셨습니다.')
+
+    # 장비 장착하기
+    def EquipItem(self):
+        item_name = input('장착할 아이템 이름(취소:0): ')
+        if item_name == '0':
+            return
+        item = Item()
+        Item_data = item.LoadItem(item_name)
+        
+        # 아이템 타입
+        if not Item_data['type'] in ['투구', '반지', '목걸이', '갑옷', '바지', '신발', '무기']:
+            print('장착할 수 없습니다.')
+        else:
+            # 장착
+            self.armor[Item_data['type']] = Item_data['name']
+            print(f"{Item_data['name']}을(를) 장착하였습니다.")
+            print(self.inventory)
+            self.inventory.remove(Item_data['name'])       # 장착 했으니 인벤토리에서 삭제
+        
+        self.ViewArmor()
+        print(self.inventory)
+        
+    # 장비 장착 해제(self):
+    def UnEquipItem(self):
+        self.armor_list = [item for sublist in self.armor.values() for item in (sublist if isinstance(sublist, list) else [sublist])]
+
+        print(self.armor.values())
+        item_name = input('장착 해제할 장비 이름을 입력하세요(취소:0): ')
+        if item_name == '0':
+            return
+        print(self.armor_list)
+        if item_name in self.armor_list:
+            if len(self.inventory) + 1 > self.max_inventory:
+                print('인벤토리가 가득 찼습니다. 비워주세요.')
+                return
             else:
-                armor[item_type] = item_data['name']
+                item = Item()
+                Item_data = item.LoadItem(item_name)
                 
-        print(armor)
-
-    def EquipItem(self, item_name):
-        pass
+                self.armor[Item_data['type']] = '없음'
+                self.inventory.append(Item_data['name'])
+                pass
+        else:
+            print('아이템 이름이 잘못되었습니다.')

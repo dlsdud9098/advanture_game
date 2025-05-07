@@ -1,7 +1,15 @@
 import json
 import os
+import platform
+
+os_name = platform.system()
+if os_name == "Windows":
+    clear_language = "cls"
+else:
+    clear_language = "clear"
 
 class SAVE_LOADS:
+    global clear_language
     def __init__(self):
         save_file_path = 'saves/datas/saves.json'
         # 데이터 비어있거나 파일이 없음

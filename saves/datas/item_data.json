@@ -1,11 +1,11 @@
 {
-    "\ucca0 \uac800": {
-        "name": "\ucca0 \uac800",
-        "description": "\ub2e8\ub2e8\ud55c \ucca0 \uac80\uc774\ub2e4.",
+    "\ud2bc\ud2bc\ud55c \uac11\uc637": {
+        "name": "\ud2bc\ud2bc\ud55c \uac11\uc637",
+        "description": "\ud2bc\ud2bc\ud55c \uac11\uc637\uc774\ub2e4.",
         "stat": [
             {
                 "STR": 0,
-                "AGI": 0,
+                "AGI": 5,
                 "INI": 0,
                 "LUCK": 0
             }
@@ -15,100 +15,19 @@
         ],
         "required_stat": [
             {
-                "STR": 15,
-                "AGI": 0,
+                "STR": 10,
+                "AGI": 5,
                 "INT": 0,
                 "LUCK": 0
             }
         ],
-        "attack_score": 50,
-        "defense_score": 0,
+        "attack_score": 0,
+        "defense_score": 50,
         "drop": 0,
-        "type": "\ubb34\uae30"
+        "type": "\uac11\uc637"
     },
-    "\ucca0 \uac801": {
-        "name": "\ucca0 \uac801",
-        "description": "\ub2e8\ub2e8\ud55c \ucca0 \uac80\uc774\ub2e4.",
-        "stat": [
-            {
-                "STR": 0,
-                "AGI": 0,
-                "INI": 0,
-                "LUCK": 0
-            }
-        ],
-        "required_class": [
-            "\uc804\uc0ac"
-        ],
-        "required_stat": [
-            {
-                "STR": 15,
-                "AGI": 0,
-                "INT": 0,
-                "LUCK": 0
-            }
-        ],
-        "attack_score": 50,
-        "defense_score": 0,
-        "drop": 0,
-        "type": "\ubb34\uae30"
-    },
-    "\ucca0 \uac802": {
-        "name": "\ucca0 \uac802",
-        "description": "\ub2e8\ub2e8\ud55c \ucca0 \uac80\uc774\ub2e4.",
-        "stat": [
-            {
-                "STR": 0,
-                "AGI": 0,
-                "INI": 0,
-                "LUCK": 0
-            }
-        ],
-        "required_class": [
-            "\uc804\uc0ac"
-        ],
-        "required_stat": [
-            {
-                "STR": 15,
-                "AGI": 0,
-                "INT": 0,
-                "LUCK": 0
-            }
-        ],
-        "attack_score": 50,
-        "defense_score": 0,
-        "drop": 0,
-        "type": "\ubb34\uae30"
-    },
-    "\ucca0 \uac803": {
-        "name": "\ucca0 \uac803",
-        "description": "\ub2e8\ub2e8\ud55c \ucca0 \uac80\uc774\ub2e4.",
-        "stat": [
-            {
-                "STR": 0,
-                "AGI": 0,
-                "INI": 0,
-                "LUCK": 0
-            }
-        ],
-        "required_class": [
-            "\uc804\uc0ac"
-        ],
-        "required_stat": [
-            {
-                "STR": 15,
-                "AGI": 0,
-                "INT": 0,
-                "LUCK": 0
-            }
-        ],
-        "attack_score": 50,
-        "defense_score": 0,
-        "drop": 0,
-        "type": "\ubb34\uae30"
-    },
-    "\ucca0 \uac804": {
-        "name": "\ucca0 \uac804",
+    "\ucca0 \uac80": {
+        "name": "\ucca0 \uac80",
         "description": "\ub2e8\ub2e8\ud55c \ucca0 \uac80\uc774\ub2e4.",
         "stat": [
             {
