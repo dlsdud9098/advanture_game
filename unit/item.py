@@ -70,10 +70,10 @@ class Item():
             return 
         
         # 데이터를 변환하여 출력 형태를 조정
-        stat_lines = [f"{key} {value}" for key, value in item_data["stat"][0].items()]
+        stat_lines = [f"{key} {value}" for key, value in item_data["stat"].items()]
         stat_text = "\n".join(stat_lines)
         
-        required_stat_lines = [f"{key} {value}" for key, value in item_data["required_stat"][0].items()]
+        required_stat_lines = [f"{key} {value}" for key, value in item_data["required_stat"].items()]
         required_stat_text = "\n".join(required_stat_lines)
         
         # 착용 가능 클래스를 줄바꿈으로 변환

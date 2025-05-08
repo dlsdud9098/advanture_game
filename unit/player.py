@@ -171,17 +171,6 @@ class Player():
         # 빈 DataFrame 생성: 4열로 생성
         display_status = pd.DataFrame(index=range(7), columns=range(4))
 
-        data = {
-            "Level": self.LV,
-            "Name": self.name,
-            "CLASS": self.CLASS,
-            "HP": self.hp,
-            "MP": self.mp,
-            "소지 골드": self.money,
-            "STR": self.STR,
-            "AGI": self.AGI,
-            "INT": self.INT
-        }
         
         # 데이터 추가
         display_status.iloc[0, 0] = "Level"
@@ -305,12 +294,24 @@ class Player():
         if not Item_data['type'] in ['투구', '반지', '목걸이', '갑옷', '바지', '신발', '무기']:
             print('장착할 수 없습니다.')
         else:
-            # 장착
-            self.armor[Item_data['type']] = Item_data['name']
-            print(f"{Item_data['name']}을(를) 장착하였습니다.")
-            self.inventory.remove(Item_data['name'])       # 장착 했으니 인벤토리에서 삭제
+            # 장착 요건 확인
+            player_stats = self.get_status()
+            if (Item_data['required_class'] == player_stats['CLASS']) and \
+                (Item_data['required_stat']['STR'] <= player_stats['STR']) and (Item_data['required_stat']['AGI'] <= player_stats['AGI']) and \
+                (Item_data['required_stat']['INT'] <= player_stats['INT']) and (Item_data['required_stat']['LUCK'] <= player_stats['LUCK']):
 
-        
+                # 장착
+                self.armor[Item_data['type']] = Item_data['name']
+                print(f"{Item_data['name']}을(를) 장착하였습니다.")
+                self.inventory.remove(Item_data['name'])       # 장착 했으니 인벤토리에서 삭제
+                
+                print(Item_data['stat']['STR'])
+                # 장착시 스텟 증가
+                self.STR += Item_data['stat']['STR']
+                self.AGI += Item_data['stat']['AGI']
+                self.INT += Item_data['stat']['INT']
+                self.LUCK += Item_data['stat']['LUCK']
+
     # 장비 장착 해제(self):
     def UnEquipItem(self):
         self.armor_list = [item for sublist in self.armor.values() for item in (sublist if isinstance(sublist, list) else [sublist]) if item != '없음']
