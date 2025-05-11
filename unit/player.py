@@ -107,8 +107,8 @@ class Player():
             "defense_score" : self.defense_score,
             "skills" : self.skills,
             "inventory" : self.inventory,
-            "use_items" : self.use_items,
             "unit_type" : self.unit_type,
+            "user_armor": self.user_armor,
             "money" : self.money,
             "STR" : self.STR,
             "AGI" : self.AGI,
@@ -120,7 +120,8 @@ class Player():
             "LV" : self.LV,
             "honor" : self.honor,
             "CLASS" : self.CLASS,
-            "name" : self.name
+            "name" : self.name,
+            "max_inventory": self.max_inventory
         }
         
     # 직접 지정(캐릭터 불러올 때)
