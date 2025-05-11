@@ -3,6 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QStackedWidget, QScrollArea, QWidget, QVBoxLayout, QApplication, QHBoxLayout, QLabel, QPushButton
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QSizePolicy
 import os
 
 from saves.save_loads import SAVE_LOADS
@@ -14,12 +15,9 @@ class LoadGameWindow(QStackedWidget,load_window):
         super().__init__()
         self.setupUi(self)  # UI 초기화
         
-        # ScrollArea 설정
-        self.scroll_area = QScrollArea(self)
-        self.scroll_area.setWidgetResizable(True)  # 콘텐츠 크기에 맞게 스크롤 조정
-        self.scroll_area_widget = QWidget()  # ScrollArea 내부에 들어갈 위젯
-        self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)  # 내부 레이아웃
-        self.scroll_area.setWidget(self.scroll_area_widget)  # ScrollArea에 위젯 추가
+        # scrollAreaWidgetContents 안의 레이아웃 초기화
+        self.scroll_layout = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.scrollAreaWidgetContents.setLayout(self.scroll_layout)
         
         self.SyncData()
         
@@ -28,59 +26,57 @@ class LoadGameWindow(QStackedWidget,load_window):
         svld = SAVE_LOADS()
         datas = svld.data_load()
         
-        # print(datas)
+        # 기존 레이아웃 초기화
+        while self.scroll_layout.count():
+            child = self.scroll_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+                
+        # print(datas.values())
         
-        # 이미지 추가
-        # image_label = QLabel()
-        # pixmap = QPixmap(char["image"]) if char["image"] else QPixmap(100, 100)
-        # pixmap = pixmap.scaled(80, 80, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        # image_label.setPixmap(pixmap)
-        # character_widget = QWidget()
-        # character_data_layout = QVBoxLayout(character_widget)
+        for data in datas.values():
+            # 수평 레이아웃 생성
+            horizontal_layout = QHBoxLayout()
+            
+            # 이미지 공간 (현재는 Label로 대체)
+            image_label = QLabel("이미지")
+            image_label.setFixedSize(50, 50)  # 이미지 크기 설정
+            image_label.setStyleSheet("border: 1px solid black;")  # 임시 스타일
+            horizontal_layout.addWidget(image_label)
+            
+            # 수직 레이아웃 (텍스트 정보)
+            vertical_layout_1 = QVBoxLayout()
+            # 수직 레이아웃
+            vertical_layout_2 = QVBoxLayout()
+            
+            # 레이아웃에 삽입할 데이터
+            name_label = QLabel(f"이름: {data['name']}")
+            class_label = QLabel(f"클래스: {data['CLASS']}")
+            hp_label = QLabel(f"HP: {data['hp']}")
+            mp_label = QLabel(f"MP: {data['mp']}")
+            money_label = QLabel(f"소지금액: {data['money']}")\
+            
+            # 라벨 크기 조정 (최대 크기를 지정하여 늘어나지 않도록)
+            for label in [name_label, hp_label, mp_label, money_label, class_label]:
+                # label.setSizePolicy(QLabel.Fixed, QLabel.Fixed)
+                label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            
+            # 수직 레이아웃에 데이터 넣기
+            vertical_layout_1.addWidget(name_label)
+            vertical_layout_1.addWidget(class_label)
+            
 
-        # for data in datas.values():
-            
-        #     # 이미지 추가
-        #     image_label = QLabel()
-        #     pixmap = QPixmap(80, 80)  # 기본 크기의 빈 이미지를 생성
-        #     pixmap.fill(Qt.gray)  # 기본 이미지는 회색
-        #     image_label.setPixmap(pixmap)
-        #     image_label.setFixedSize(80, 80)  # 이미지 크기 설정
-        #     image_label.setStyleSheet("border: 1px solid black;")  # 테두리 스타일
-            
-        #     # 텍스트 레이아웃 (수직 레이아웃)
-        #     text_layout = QVBoxLayout()
-            
-        #     # 데이터 레이블 추가
-        #     name_label = QLabel(f"이름: {data['name']}")
-        #     class_label = QLabel(f"클래스: {data['CLASS']}")
-        #     hp_label = QLabel(f"HP: {data['hp']}   MP: {data['mp']}")
-        #     money_label = QLabel(f"소지금액: {data['money']}")
+            # 수직 레이아웃에 데이터 넣기
+            vertical_layout_2.addWidget(hp_label)
+            vertical_layout_2.addWidget(mp_label)
+            vertical_layout_2.addWidget(money_label)
 
-        #     # 폰트 크기 및 스타일 지정 (옵션)
-        #     for label in [name_label, class_label, hp_label, money_label]:
-        #         label.setStyleSheet("font-size: 12pt; margin: 2px;")
+            # 수평 레이아웃에 수직 레이아웃 추가
+            horizontal_layout.addLayout(vertical_layout_1)
+            horizontal_layout.addLayout(vertical_layout_2)
 
-        #     # 텍스트 레이아웃 (수직 레이아웃)
-        #     text_layout = QVBoxLayout()
-            
-        #     # 수직 레이아웃에 레이블 추가
-        #     text_layout.addWidget(name_label)
-        #     text_layout.addWidget(class_label)
-        #     text_layout.addWidget(hp_label)
-        #     text_layout.addWidget(money_label)
-            
-        #     # 수평 레이아웃에 이미지와 텍스트 추가
-        #     character_data_layout.addWidget(image_label)
-        #     character_data_layout.addLayout(text_layout)
-            
-            
-            
-            
-            
-            
-            
-            
-            
-        # # ScrollArea 레이아웃에 추가
-        # self.scroll_area_layout.addWidget(character_widget)
+            # 최종적으로 위젯으로 묶어서 ScrollArea에 추가
+            character_widget = QWidget()
+            character_widget.setLayout(horizontal_layout)
+
+            self.scroll_layout.addWidget(character_widget)
