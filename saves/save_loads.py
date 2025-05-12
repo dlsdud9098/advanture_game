@@ -26,15 +26,14 @@ class SAVE_LOADS:
     def data_update(self, data):
         player_datas = self.data_load()
         
-        # 데이터 비어있음
-        if not bool(player_datas):
-            player_datas[data['name']] = data
+        if data['name'] in player_datas.keys():
+            os.system('clear')
+            print('중복된 이름입니다.')
+            return 1
+        
         else:
-            if data['name'] in player_datas.keys():
-                os.system('clear')
-                print('중복된 이름입니다.')
-                return 1
-            player_datas.append(data)
+            player_datas[data['name']] = data
+            
         self.data_save(player_datas)
         return 0
     

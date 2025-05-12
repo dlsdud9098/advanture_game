@@ -61,12 +61,11 @@ class LoadGameWindow(QStackedWidget,load_window):
                 # label.setSizePolicy(QLabel.Fixed, QLabel.Fixed)
                 label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             
-            # 수직 레이아웃에 데이터 넣기
+            # 수직 레이아웃에 이름, 클래스 넣기
             vertical_layout_1.addWidget(name_label)
             vertical_layout_1.addWidget(class_label)
-            
 
-            # 수직 레이아웃에 데이터 넣기
+            # 수직 레이아웃에 hp, mp, money 넣기
             vertical_layout_2.addWidget(hp_label)
             vertical_layout_2.addWidget(mp_label)
             vertical_layout_2.addWidget(money_label)

@@ -26,9 +26,9 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="BACK_BTN">
         <property name="text">
-         <string>PushButton</string>
+         <string>뒤로가기</string>
         </property>
        </widget>
       </item>
@@ -43,6 +43,9 @@
     </item>
     <item>
      <widget class="QScrollArea" name="scrollArea">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -52,7 +55,7 @@
          <x>0</x>
          <y>0</y>
          <width>827</width>
-         <height>784</height>
+         <height>786</height>
         </rect>
        </property>
       </widget>
