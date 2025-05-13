@@ -27,6 +27,7 @@ class MainMenu(QMainWindow, form_class):
     def load_game(self):
         # 불러오기 페이지로 이동
         # 부모(MainWindow)의 메서드를 호출하여 페이지 전환
+        # self.parent.load_character()
         self.parent.LoadGame()
 
     def exit_game(self):
@@ -39,6 +40,9 @@ class MainMenu(QMainWindow, form_class):
         )
         if reply == QMessageBox.Yes:
             QApplication.quit()
+            
+    def syncdata(self):
+        pass
 
 
 if __name__ == '__main__':

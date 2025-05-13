@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from UI.main_menu_ui import MainMenu
 from UI.load_game_ui import LoadGameWindow
 from UI.new_game_ui import NewGameWindow
+from saves.save_loads import SAVE_LOADS
 
 # form_class = uic.loadUiType("./UI/ui_files/main.ui")[0]
 
@@ -39,11 +40,13 @@ class MainWindow(QMainWindow):
 
     # 로드 페이지로 가기
     def LoadGame(self):
+        self.load_game.load_character()
         self.stackedWidget.setCurrentWidget(self.load_game)
     
     # 새로 만들기 페이지로 가기
     def NewGame(self):
         self.stackedWidget.setCurrentWidget(self.new_game)
+        svld = SAVE_LOADS()
 
 
 if __name__ == "__main__":

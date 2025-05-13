@@ -23,7 +23,7 @@ class LoadGameWindow(QStackedWidget,load_window):
         # 뒤로가기 버튼 연결하기
         self.BACK_BTN.clicked.connect(self.BackPage)
         
-        self.load_character()
+        # self.load_character()
         
     def SyncData(self):
         svld = SAVE_LOADS()
@@ -32,11 +32,26 @@ class LoadGameWindow(QStackedWidget,load_window):
     # 뒤로 가기(메인 페이지)
     def BackPage(self):
         self.parent.switch_to_main_menu()
+    
+    # 리프레시
+    def clear_layout(self, layout):
+        """레이아웃의 모든 위젯 및 하위 레이아웃 제거"""
+        while layout.count():
+            item = layout.takeAt(0)  # 레이아웃에서 아이템 가져오기
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()  # 위젯 삭제
+            elif item.layout() is not None:
+                self.clear_layout(item.layout())  # 하위 레이아웃에 대해 재귀 호출
         
     # 캐릭터 목록 불러오기
     def load_character(self):
+        self.clear_layout(self.character_load_layout)
+        
         svld = SAVE_LOADS()
         player_data = svld.data_load()
+        
+        # print(player_data)
         
         self.character_load_layout.setSpacing(5)  # 레이아웃 간 간격 설정
         self.character_load_layout.setContentsMargins(5, 5, 5, 5)  # 여백 설정
@@ -44,7 +59,6 @@ class LoadGameWindow(QStackedWidget,load_window):
         for data in player_data.values():
             # horizontal 레이아웃 만들기
             h_layout = QHBoxLayout()
-            h_layout.setSpacing(10)  # 레이아웃 간 간격 설정
             
             # 이미지 공간 (현재는 Label로 대체)
             image_label = QLabel("이미지")
@@ -81,9 +95,26 @@ class LoadGameWindow(QStackedWidget,load_window):
             
             h_layout.addLayout(v_layout)
             
+            # 테두리용 컨테이너 생성
+            container = QWidget()
+            container.setLayout(h_layout)
+
+            # container에만 테두리 설정
+            container.setStyleSheet("QWidget { border: 1px solid black; margin: 5px; }")  
+            
+            
+            self.character_load_layout.addWidget(container)
+            
+        for _ in range(5-len(player_data)):
+            # horizontal 레이아웃 만들기
+            h_layout = QHBoxLayout()
+            label = QLabel('데이터 없음')
+            
+            label.setFixedSize(200, 60)  # 고정 크기 설정
+            h_layout.addWidget(label)
+            
             container = QWidget()
             container.setLayout(h_layout)
             container.setStyleSheet("border: 1px solid black; margin: 5px;")  # 테두리 및 여백 설정
-            
             
             self.character_load_layout.addWidget(container)

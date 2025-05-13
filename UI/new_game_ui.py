@@ -47,6 +47,9 @@ class NewGameWindow(QStackedWidget,new_window):
         if character_exist:
             QMessageBox.information(self, "Error", "닉네임이 이미 존재합니다.")
             
+        self.parent.switch_to_main_menu()
+        
+            
     # 클래스 콤보박스 동기화
     def syncClass(self):
         self.CLASS.addItem("Warrior")
