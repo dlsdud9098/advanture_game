@@ -15,67 +15,75 @@ class LoadGameWindow(QStackedWidget,load_window):
         super().__init__()
         self.setupUi(self)  # UI 초기화
         
-        # scrollAreaWidgetContents 안의 레이아웃 초기화
-        self.scroll_layout = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.scrollAreaWidgetContents.setLayout(self.scroll_layout)
-        
         self.SyncData()
+        self.parent = parent
         
-    
+        self.character_load_layout = self.findChild(QVBoxLayout, "character_load_layout")
+        
+        # 뒤로가기 버튼 연결하기
+        self.BACK_BTN.clicked.connect(self.BackPage)
+        
+        self.load_character()
+        
     def SyncData(self):
         svld = SAVE_LOADS()
         datas = svld.data_load()
         
-        # 기존 레이아웃 초기화
-        while self.scroll_layout.count():
-            child = self.scroll_layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-                
-        # print(datas.values())
+    # 뒤로 가기(메인 페이지)
+    def BackPage(self):
+        self.parent.switch_to_main_menu()
         
-        for data in datas.values():
-            # 수평 레이아웃 생성
-            horizontal_layout = QHBoxLayout()
+    # 캐릭터 목록 불러오기
+    def load_character(self):
+        svld = SAVE_LOADS()
+        player_data = svld.data_load()
+        
+        self.character_load_layout.setSpacing(5)  # 레이아웃 간 간격 설정
+        self.character_load_layout.setContentsMargins(5, 5, 5, 5)  # 여백 설정
+        
+        for data in player_data.values():
+            # horizontal 레이아웃 만들기
+            h_layout = QHBoxLayout()
+            h_layout.setSpacing(10)  # 레이아웃 간 간격 설정
             
             # 이미지 공간 (현재는 Label로 대체)
             image_label = QLabel("이미지")
             image_label.setFixedSize(50, 50)  # 이미지 크기 설정
             image_label.setStyleSheet("border: 1px solid black;")  # 임시 스타일
-            horizontal_layout.addWidget(image_label)
+            h_layout.addWidget(image_label)
             
             # 수직 레이아웃 (텍스트 정보)
-            vertical_layout_1 = QVBoxLayout()
-            # 수직 레이아웃
-            vertical_layout_2 = QVBoxLayout()
-            
-            # 레이아웃에 삽입할 데이터
+            v_layout = QVBoxLayout()
+            lv_label = QLabel(f"Level: {data['LV']}")
+            lv_label.setFixedSize(200, 60)  # 고정 크기 설정
             name_label = QLabel(f"이름: {data['name']}")
+            name_label.setFixedSize(200, 60)  # 고정 크기 설정
             class_label = QLabel(f"클래스: {data['CLASS']}")
+            class_label.setFixedSize(200, 60)  # 고정 크기 설정
+            
+            v_layout.addWidget(lv_label)
+            v_layout.addWidget(name_label)
+            v_layout.addWidget(class_label)
+            
+            h_layout.addLayout(v_layout)
+            
+            v_layout = QVBoxLayout()
             hp_label = QLabel(f"HP: {data['hp']}")
+            hp_label.setFixedSize(200, 60)  # 고정 크기 설정
             mp_label = QLabel(f"MP: {data['mp']}")
-            money_label = QLabel(f"소지금액: {data['money']}")\
+            mp_label.setFixedSize(200, 60)  # 고정 크기 설정
+            money_label = QLabel(f"소지금액: {data['money']}")
+            money_label.setFixedSize(200, 60)  # 고정 크기 설정
             
-            # 라벨 크기 조정 (최대 크기를 지정하여 늘어나지 않도록)
-            for label in [name_label, hp_label, mp_label, money_label, class_label]:
-                # label.setSizePolicy(QLabel.Fixed, QLabel.Fixed)
-                label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            v_layout.addWidget(hp_label)
+            v_layout.addWidget(mp_label)
+            v_layout.addWidget(money_label)
             
-            # 수직 레이아웃에 이름, 클래스 넣기
-            vertical_layout_1.addWidget(name_label)
-            vertical_layout_1.addWidget(class_label)
-
-            # 수직 레이아웃에 hp, mp, money 넣기
-            vertical_layout_2.addWidget(hp_label)
-            vertical_layout_2.addWidget(mp_label)
-            vertical_layout_2.addWidget(money_label)
-
-            # 수평 레이아웃에 수직 레이아웃 추가
-            horizontal_layout.addLayout(vertical_layout_1)
-            horizontal_layout.addLayout(vertical_layout_2)
-
-            # 최종적으로 위젯으로 묶어서 ScrollArea에 추가
-            character_widget = QWidget()
-            character_widget.setLayout(horizontal_layout)
-
-            self.scroll_layout.addWidget(character_widget)
+            h_layout.addLayout(v_layout)
+            
+            container = QWidget()
+            container.setLayout(h_layout)
+            container.setStyleSheet("border: 1px solid black; margin: 5px;")  # 테두리 및 여백 설정
+            
+            
+            self.character_load_layout.addWidget(container)

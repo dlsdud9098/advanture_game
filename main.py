@@ -1,6 +1,6 @@
-from unit.player import Player
-from display.display_select import MainDisplay
-from game.main_game import MAIN_GAME
+# from unit.player import Player
+# from display.display_select import MainDisplay
+# from game.main_game import MAIN_GAME
 
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget

@@ -3,7 +3,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget, QStackedWidget
 import os
 from saves.save_loads import SAVE_LOADS
-from unit.player import Player
+from unit.player.player import Player
 
 new_window = uic.loadUiType("./UI/ui_files/new_game_ui.ui")[0]
 
@@ -31,7 +31,7 @@ class NewGameWindow(QStackedWidget,new_window):
         self.name = self.CHARACTER_NAME.text()
         self.character_class = self.CLASS.currentText()
     
-        print(self.name, self.character_class)
+        # print(self.name, self.character_class)
         
         if self.character_class == 'Warrior':
             set_class = '전사'

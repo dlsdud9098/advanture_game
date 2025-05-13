@@ -8,16 +8,19 @@ class SAVE_LOADS:
         if not os.path.exists(save_file_path) or os.path.getsize(save_file_path) == 0:
             with open(save_file_path, 'wb') as f:
                 pickle.dump({}, f)
+                
+        self.player_data = None
+        self.data_path = 'saves/datas/saves.bin'
     
     # 데이터 저장하기
     def data_save(self, player_datas):
-        with open('saves/datas/saves.bin', 'wb') as file:
+        with open(self.data_path, 'wb') as file:
             pickle.dump(player_datas, file)
 
         
     # 데이터 가져오기
     def data_load(self):
-        with open('saves/datas/saves.bin', 'rb') as f:
+        with open(self.data_path, 'rb') as f:
             player_datas = pickle.load(f)
         
         return player_datas
@@ -40,3 +43,4 @@ class SAVE_LOADS:
     # 플레이어 로드하기
     def player_load(self, data):
         data
+        
