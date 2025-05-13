@@ -1,0 +1,11 @@
+{
+    "font_paths": {
+        "malgun": "fonts/malgun.ttf"
+    },
+    "fonts": {
+        "default": {
+            "size": 14,
+            "name": "malgun"
+        }
+    }
+}
