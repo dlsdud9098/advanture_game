@@ -46,7 +46,7 @@ class NewGameWindow(QStackedWidget,new_window):
         
         if character_exist:
             QMessageBox.information(self, "Error", "닉네임이 이미 존재합니다.")
-            
+            return        
         self.parent.StartMain(self.name)
         
             

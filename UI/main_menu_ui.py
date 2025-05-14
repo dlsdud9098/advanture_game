@@ -1,7 +1,6 @@
 import sys
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QDialog, QListWidget, QPushButton
-import os
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 
 

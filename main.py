@@ -9,13 +9,13 @@ from UI.main_menu_ui import MainMenu
 from UI.load_game_ui import LoadGameWindow
 from UI.new_game_ui import NewGameWindow
 from UI.start_main_ui import StartMainWindow
-from saves.save_loads import SAVE_LOADS
 
 # form_class = uic.loadUiType("./UI/ui_files/main.ui")[0]
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.setGeometry(100, 100, 1700, 850)
 
         # QStackedWidget 생성
         self.stackedWidget = QStackedWidget()

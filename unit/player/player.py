@@ -22,13 +22,14 @@ class Player(Inventory, Armor, Money):
         self.skills = []                    # 개체의 스킬
         self.inventory = ['철 검', '철 갑옷']          # 개체가 소지하고 있는 아이템
         self.wear_armor = {                 # 착용하고 있는 아이템
-                '투구': '',
-                '목걸이': '',
-                '반지': [],
-                '갑옷': '',
-                '바지': '',
-                '신발': '',
-                '무기': ''
+                '투구': '비어있음',
+                '목걸이': '비어있음',
+                '반지': ['비어있음','비어있음'],
+                '갑옷': '비어있음',
+                '바지': '비어있음',
+                '신발': '비어있음',
+                '무기': '비어있음',
+                '가방': '비어있음'
             }                
         self.max_inventory = 10             # 최대 인벤토리 크기
         self.money = 1000                   # 개체가 소지하고 있는 골드(또는 드랍하는 골드)
@@ -83,7 +84,7 @@ class Player(Inventory, Armor, Money):
             "AVOID": self.AVOID,
             "skills": self.skills,
             "inventory": self.inventory,
-            "user_armor": self.wear_armor,
+            "wear_armor": self.wear_armor,
             "max_inventory": self.max_inventory,
             "money": self.money,
             "STR": self.STR,
