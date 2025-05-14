@@ -20,7 +20,7 @@ class Player(Inventory, Armor, Money):
         self.AVOID = 0.5                    # 회피 확률
         
         self.skills = []                    # 개체의 스킬
-        self.inventory = ['철 검', '튼튼한 갑옷']          # 개체가 소지하고 있는 아이템
+        self.inventory = ['철 검', '철 갑옷']          # 개체가 소지하고 있는 아이템
         self.wear_armor = {                 # 착용하고 있는 아이템
                 '투구': '',
                 '목걸이': '',

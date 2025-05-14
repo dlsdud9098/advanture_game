@@ -50,7 +50,6 @@ class Item():
     # 아이템 검색하기
     def SearchItem(self, item_name):
         if item_name in self.itemDB:
-            pass
             item = self.itemDB[item_name]
             return item
         else:
@@ -91,15 +90,19 @@ class Item():
         # 출력
         print(tabulate(table_data, tablefmt="plain", colalign=("left", "left")))
     
+    # 아이템 추가하기
     def AddItem(self, new_item):
+        # 아이템이 기존 DB에 존재하는지 확인
         if new_item['name'] in self.itemDB:
             print('중복된 아이템입니다.')
             return
         
+        # 아이템 추가하기
         self.itemDB[new_item['name']] = {}
         for key, value in new_item.items():
             self.itemDB[new_item['name']][key] = value
     
+        # 추가된 사항 저장하기
         self.UpdateItemDataBase()
 
     # 아이템 삭제하기

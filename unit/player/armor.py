@@ -25,7 +25,7 @@ class Armor:
         for item in self.inventory:
             data = iteM.SearchItem(item)
             if data:
-                if data['type'] in ['weapon', 'helmat', 'top_clothes', 'bottom_clothes', 'ring', 'necklace', 'shose']:
+                if data['type'] in ['갑옷', '바지', '신발', '반지','목걸이', '투구', '무기']:
                     data_list[data['name']] = data
                 
         print(data_list)

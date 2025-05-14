@@ -63,6 +63,9 @@ class LoadGameWindow(QStackedWidget,load_window):
         svld.delete_player(name)
         self.load_character()  # 데이터 갱신 및 UI 업데이트
     
+    def start_game(self, name):
+        self.parent.StartMain(name)
+    
     # 캐릭터 데이터 넣기
     def create_character_widget(self, data):
         charater_layout = QGridLayout()
@@ -100,6 +103,7 @@ class LoadGameWindow(QStackedWidget,load_window):
         play_character_btn = QPushButton("Play")
         
         delete_character_btn.clicked.connect(lambda: self.delete_character(data['name']))
+        play_character_btn.clicked.connect(lambda: self.start_game(data['name']))
         
         delete_character_btn.setFixedSize(70, 30)
         play_character_btn.setFixedSize(70, 30)

@@ -29,6 +29,7 @@ class SAVE_LOADS:
     def data_add(self, data):
         player_datas = self.data_load()
         
+        # 플레이어 이름 중복 검사
         if data['name'] in player_datas.keys():
             os.system('clear')
             print('중복된 이름입니다.')
@@ -47,9 +48,11 @@ class SAVE_LOADS:
         pass
     
     # 플레이어 로드하기
-    def player_load(self, data):
-        data
-        
+    def player_load(self, name):
+        player_datas = self.data_load()
+        return player_datas[name]
+    
+    # 플레이어 데이터 삭제하기
     def delete_player(self, name):
         player_datas = self.data_load()
         del player_datas[name]
