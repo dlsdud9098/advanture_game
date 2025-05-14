@@ -1,109 +1,60 @@
-import pygame
-import pygame_gui
-from UI.start import start_screen
-from UI.options import options_screen
-from pygame_gui.core.resource_loaders import BlockingThreadedResourceLoader
+# from unit.player import Player
+# from display.display_select import MainDisplay
+# from game.main_game import MAIN_GAME
 
-def remove_main_menu_buttons():
-    """메인 메뉴 버튼을 제거합니다."""
-    start_button.kill()
-    options_button.kill()
-    quit_button.kill()
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 
-def create_main_menu_buttons():
-    """메인 메뉴 버튼을 다시 생성합니다."""
-    global start_button, options_button, quit_button
-    start_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((350, 200), (100, 50)),
-        text='New Game',
-        manager=manager
-    )
-    options_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((350, 300), (100, 50)),
-        text='Load Game',
-        manager=manager
-    )
-    quit_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((350, 400), (100, 50)),
-        text='Quit',
-        manager=manager
-    )
-    
-if __name__ == '__main__':
+from UI.main_menu_ui import MainMenu
+from UI.load_game_ui import LoadGameWindow
+from UI.new_game_ui import NewGameWindow
+from saves.save_loads import SAVE_LOADS
 
-    pygame.init()
+# form_class = uic.loadUiType("./UI/ui_files/main.ui")[0]
 
-    # 화면 설정
-    WIDTH, HEIGHT = 800, 600
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Modular Screen Transition")
-    font = pygame.font.SysFont("malgungothic", 80) # 시스템 폰트 사용 시
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("게임 화면 전환")
+        self.setGeometry(100, 100, 850, 850)
 
-    # 매니저 설정
-    # manager = pygame_gui.UIManager((WIDTH, HEIGHT))
-    manager = pygame_gui.UIManager((WIDTH, HEIGHT), "theme.json")
+        # QStackedWidget 생성
+        self.stackedWidget = QStackedWidget()
+        self.setCentralWidget(self.stackedWidget)
 
-
-    # 메인 메뉴 버튼
-    start_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((350, 200), (100, 50)),
-        # text = font.render('새로 만들기', True, (255,255,255)),
-        text='New Game',
-        manager=manager
-    )
-
-    options_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((350, 300), (100, 50)),
-        text='Load Game',
-        manager=manager
-    )
-
-    quit_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((350, 400), (100, 50)),
-        text='Quit',
-        manager=manager
-    )
-
-
-    current_screen = "menu"
-    running = True
-    clock = pygame.time.Clock()
-
-    while running:
-        time_delta = clock.tick(60) / 1000.0
-
-        if current_screen == "menu":
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-                manager.process_events(event)
-
-                if event.type == pygame.USEREVENT:
-                    if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-                        if event.ui_element == start_button:
-                            current_screen = "start"
-                            remove_main_menu_buttons()  # 버튼 제거
-                        elif event.ui_element == options_button:
-                            current_screen = "options"
-                            remove_main_menu_buttons()  # 버튼 제거
-                        elif event.ui_element == quit_button:
-                            running = False
-            
-            # 메인 메뉴 렌더링
-            screen.fill((255, 255, 255))
-            manager.update(time_delta)
-            manager.draw_ui(screen)
-            pygame.display.flip()
-
-        elif current_screen == "start":
-            current_screen = start_screen(manager, screen)
-            if current_screen == "menu":
-                create_main_menu_buttons()  # 버튼 다시 생성
+        # 페이지 추가
+        self.main_menu = MainMenu(self)
+        self.load_game = LoadGameWindow(self)
+        self.new_game = NewGameWindow(self)
         
-        elif current_screen == "options":
-            current_screen = options_screen(manager, screen)
-            if current_screen == "menu":
-                create_main_menu_buttons()  # 버튼 다시 생성
+        # 페이지 연결하기
+        self.stackedWidget.addWidget(self.main_menu)    # 메인 페이지
+        self.stackedWidget.addWidget(self.load_game)    # 캐릭터 로드
+        self.stackedWidget.addWidget(self.new_game)     # 새로 만들기
 
-    pygame.quit()
+        # 기본 페이지 설정
+        self.stackedWidget.setCurrentWidget(self.main_menu)
+
+    def switch_to_main_menu(self):
+        self.stackedWidget.setCurrentWidget(self.main_menu)
+
+    # 로드 페이지로 가기
+    def LoadGame(self):
+        self.load_game.load_character()
+        self.stackedWidget.setCurrentWidget(self.load_game)
+    
+    # 새로 만들기 페이지로 가기
+    def NewGame(self):
+        self.stackedWidget.setCurrentWidget(self.new_game)
+        svld = SAVE_LOADS()
+
+
+if __name__ == "__main__":
+    # main = MAIN_GAME()
+    # main.GAMESTART()
+    # MainDisplay()
+    
+    app = QApplication(sys.argv)
+    main_window = MainWindow()
+    main_window.show()
+    app.exec_()
