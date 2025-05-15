@@ -34,7 +34,7 @@
          <x>0</x>
          <y>0</y>
          <width>817</width>
-         <height>784</height>
+         <height>786</height>
         </rect>
        </property>
       </widget>
@@ -458,7 +458,41 @@
      </widget>
     </item>
     <item>
-     <widget class="QTableWidget" name="InventoryTable"/>
+     <widget class="QTabWidget" name="InventoryTab">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="all_items">
+       <attribute name="title">
+        <string>전체</string>
+       </attribute>
+       <widget class="QTableWidget" name="InventoryTable">
+        <property name="geometry">
+         <rect>
+          <x>-2</x>
+          <y>-1</y>
+          <width>811</width>
+          <height>541</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="armor_items">
+       <attribute name="title">
+        <string>장비</string>
+       </attribute>
+       <widget class="QTableWidget" name="ArmorTable">
+        <property name="geometry">
+         <rect>
+          <x>-5</x>
+          <y>-9</y>
+          <width>821</width>
+          <height>551</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>

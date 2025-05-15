@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import (
     QLabel,
     QTableWidgetItem,
     QTableWidget,
-    QMenu
+    QMenu,
+    QSizePolicy
     )
 from saves.save_loads import SAVE_LOADS
 from UI.inventory_ui import InventoryWindow
@@ -53,15 +54,32 @@ class StartMainWindow(QMainWindow, form_class):
         self.name = None
         self.player_inventory = None
         
+        # 인벤토리 탭 연결하기
+        # 탭 변경 시그널 연결
+        self.InventoryTab.currentChanged.connect(self.on_tab_changed)
+
+        # 초기화: 첫 번째 탭 활성화 및 데이터 설정
+        self.InventoryTab.setCurrentIndex(0)
+        
         # 테이블 위젯 연결하기
         self.inventory_table_widget = self.findChild(QTableWidget, 'InventoryTable')
-        if not self.inventory_table_widget:
-            raise ValueError("TableWidget 'InventoryTable' not found in UI file.")
+        self.armor_inventory_table_widget = self.findChild(QTableWidget, 'ArmorTable')
         
         # 우클릭 이벤트 연결
         self.inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.inventory_table_widget.customContextMenuRequested.connect(self.WearArmor)
         
+    def on_tab_changed(self, index):
+        """
+        탭 변경됨
+        """    
+        
+        # 전체 인벤토리
+        if index == 0:
+            self.LoadInventory()
+        elif index == 1:
+            self.LoadInventoryArmor()
+    
     # 플레이어 정보에 대한 내용을 새로고침(업데이트) 합니다.
     def refresh_widget(self):
         self.load_player_data(self.name)
@@ -102,7 +120,7 @@ class StartMainWindow(QMainWindow, form_class):
         self.player_inventory = self.player_data['inventory']
         
         # 테이블 데이터 넣기
-        self.LoadInventory()
+        # self.LoadInventory()
         self.LoadArmor()
     
     # 테이블 데이터 선택 못하게 하기
@@ -123,7 +141,7 @@ class StartMainWindow(QMainWindow, form_class):
         
         # 행 수 설정
         self.inventory_table_widget.setRowCount(len(self.player_inventory))
-
+        self.inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         # 열의 크기 조절
         self.inventory_table_widget.setColumnWidth(0, 250)  # 첫 번째 열의 너비를 150px로 설정
         self.inventory_table_widget.setColumnWidth(1, 300)   # 두 번째 열의 너비를 50px로 설정
@@ -180,4 +198,13 @@ class StartMainWindow(QMainWindow, form_class):
         elif action == action2:
             print("Action 2 selected")
     
-    
+    def LoadInventoryArmor(self):
+        item = Item()
+        
+        self.armor_inventory_table_widget.setColumnCount(5)  # 필요한 열 수
+        self.armor_inventory_table_widget.setHorizontalHeaderLabels([
+            "아이템 이름", "아이템 설명", "공격력", "방어력", "부위"
+        ])
+        
+        # 현재 인벤토리에서 장비 아이템만 가져오기
+        print(self.player_inventory)
