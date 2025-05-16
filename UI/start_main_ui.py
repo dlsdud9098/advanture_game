@@ -15,6 +15,7 @@ from PyQt5.QtCore import Qt
 from unit.item import Item
 from unit.player.armor import Armor
 from unit.player.consum import Consum
+from .item_view_ui import ItemViewWindow
 
 form_class = uic.loadUiType("./UI/ui_files/start_game_main_ui.ui")[0]
 
@@ -274,7 +275,7 @@ class StartMainWindow(QMainWindow, form_class):
         elif action == useItem:
             print("UseItem selected")
         elif action == view_item:       # 아이템 상세보기
-            print('Action 2 selected')
+            self.show_item_detail(item_data)
         elif action == wearRing1:       # 왼손에 반지 착용
             # 아이템 제거
             self.player_inventory.remove(item_data['name'])
@@ -285,6 +286,11 @@ class StartMainWindow(QMainWindow, form_class):
             self.WearArmor(item_data, item_data['type'], 'right')
             
         self.refresh_widget()
+    
+    def show_item_detail(self, item_data):
+        # 아이템 상세보기 다이얼로그 생성
+        detail_dialog = ItemViewWindow(item_data, self)
+        detail_dialog.exec_()    # 모달 창으로 실행
     
     # 장비 착용
     def WearArmor(self, item_data, item_type, hands = None):
