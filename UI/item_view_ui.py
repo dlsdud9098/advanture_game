@@ -35,10 +35,10 @@ class ItemViewWindow(QDialog, form_class):
             ("아이템 이름", item_data['name']),
             ("아이템 타입", item_data['type']),
             ("아이템 요구 스탯", ""),  # 요구 스탯 구분선
-            ("  STR", item_data['required_stat'].get('STR', 0)),
-            ("  AGI", item_data['required_stat'].get('AGI', 0)),
-            ("  INT", item_data['required_stat'].get('INT', 0)),
-            ("  LUCK", item_data['required_stat'].get('LUCK', 0)),
+            ("STR", item_data['required_stat'].get('STR', 0)),
+            ("AGI", item_data['required_stat'].get('AGI', 0)),
+            ("INT", item_data['required_stat'].get('INT', 0)),
+            ("LUCK", item_data['required_stat'].get('LUCK', 0)),
         ]
         
         # 테이블 행 및 열 설정
@@ -49,14 +49,15 @@ class ItemViewWindow(QDialog, form_class):
 
         # 데이터 추가
         for row, (attribute, value) in enumerate(details):
-            # table_widget.setItem(row, 0, QTableWidgetItem(attribute))
             table_widget.setItem(row, 0, self.CantEdit(attribute))
-            # table_widget.setItem(row, 1, QTableWidgetItem(str(value)))
             table_widget.setItem(row, 1, self.CantEdit(str(value)))
 
         # 열 크기 조정
         table_widget.resizeColumnsToContents()
-        table_widget.setColumnWidth(0, 150)  # 첫 번째 열 너비 고정
+        # table_widget.setColumnWidth(0, 150)  # 첫 번째 열 너비 고정
+        
+        # 열 비율 설정
+        self.set_column_weights(table_widget, [1,2])  # 첫 번째 열: 1, 두 번째 열: 2
         
         # 테이블 데이터 선택 못하게 하기
     def CantEdit(self, data):
@@ -66,7 +67,7 @@ class ItemViewWindow(QDialog, form_class):
         item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # 수정 불가능
         return item
     
-    def set_column_weights(table_widget, weights):
+    def set_column_weights(self, table_widget, weights):
         """
         테이블의 열 너비를 비율(weight)에 따라 설정합니다.
 
@@ -79,4 +80,4 @@ class ItemViewWindow(QDialog, form_class):
 
         # 각 열의 비율에 따라 크기 설정
         for i, weight in enumerate(weights):
-            table_widget.setColumnWidth(i, weight / total_weight * table_widget.width())
+            table_widget.setColumnWidth(i, int(weight / total_weight * table_widget.width()))
