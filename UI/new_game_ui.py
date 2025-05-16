@@ -44,9 +44,13 @@ class NewGameWindow(QStackedWidget,new_window):
         svld = SAVE_LOADS()
         character_exist = svld.data_add(data)
         
-        if character_exist:
+        if character_exist == 1:
             QMessageBox.information(self, "Error", "닉네임이 이미 존재합니다.")
-            return        
+            return
+        elif character_exist == 2:
+            QMessageBox.information(self, "Error", "캐릭터의 생성 개수를 초과하였습니다.")
+            return
+        
         self.parent.StartMain(self.name)
         
             

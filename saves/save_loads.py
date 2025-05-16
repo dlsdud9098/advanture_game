@@ -28,18 +28,20 @@ class SAVE_LOADS:
     # 새로운 플레이어 데이터 추가하기
     def data_add(self, data):
         player_datas = self.data_load()
-        
+        print(len(player_datas))
         # 플레이어 이름 중복 검사
         if data['name'] in player_datas.keys():
             os.system('clear')
             print('중복된 이름입니다.')
             return 1
-        
+        if len(player_datas) > 4:
+            print('캐릭터의 생성 개수를 초과하였습니다.')
+            return 2
         else:
             player_datas[data['name']] = data
             
-        self.data_save(player_datas)
-        return 0
+            self.data_save(player_datas)
+            return 0
     
     # 데이터 새로고침
     def data_sync(self, player_datas):

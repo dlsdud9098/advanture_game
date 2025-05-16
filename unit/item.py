@@ -4,15 +4,18 @@ from tabulate import tabulate
 
 class Item():
     def __init__(self, 
-                name = None, 
-                description = None,
+                name = None,            
+                description = None,     
                 required_class = None,
                 required_stat = None,
                 attack = None, 
                 defense = None, 
+                hp = None,
+                mp = None,
                 stat = None, 
                 drop = None,
-                type = None
+                type = None,
+                using = None    # 장비에 한해서 착용 여부
                 ):
         
         self.name = name
@@ -22,6 +25,9 @@ class Item():
         self.required_class = required_class    # 착용 가능 직업
         self.required_stat = required_stat      # 착용 가능 레벨, 스텟
         
+        
+        self.hp = hp,
+        self.mp = mp,
         self.attack_score = attack
         self.defense_score = defense
         
@@ -83,7 +89,7 @@ class Item():
             ["공격력", item_data["attack_score"]],
             ["방어력", item_data["defense_score"]],
             ["드랍확률", item_data.get("drop_chance", 0)],
-            ["부위", item_data.get('type', 0)]
+            ["타입", item_data.get('type', 0)]
         ]
         
         

@@ -25,13 +25,11 @@ class MainWindow(QMainWindow):
         self.main_menu = MainMenu(self)
         self.load_game = LoadGameWindow(self)
         self.new_game = NewGameWindow(self)
-        self.start_main = StartMainWindow(self)
         
         # 페이지 연결하기
         self.stackedWidget.addWidget(self.main_menu)    # 메인 페이지
         self.stackedWidget.addWidget(self.load_game)    # 캐릭터 로드
         self.stackedWidget.addWidget(self.new_game)     # 새로 만들기
-        self.stackedWidget.addWidget(self.start_main)   # 게임 메인 페이지
 
         # 기본 페이지 설정
         self.stackedWidget.setCurrentWidget(self.main_menu)
@@ -50,8 +48,10 @@ class MainWindow(QMainWindow):
 
     # 시작 메인 페이지로 가기
     def StartMain(self, name):
+        self.start_main = StartMainWindow(self, name)
+        self.stackedWidget.addWidget(self.start_main)   # 게임 메인 페이지
         self.stackedWidget.setCurrentWidget(self.start_main)
-        self.start_main.load_player_data(name)
+        # self.start_main.load_player_data(name)
 
 if __name__ == "__main__":    
     app = QApplication(sys.argv)

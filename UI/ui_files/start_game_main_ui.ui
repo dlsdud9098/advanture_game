@@ -24,6 +24,17 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="SAVE_BTN">
+        <property name="text">
+         <string>저장하기</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QScrollArea" name="scrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
@@ -34,7 +45,7 @@
          <x>0</x>
          <y>0</y>
          <width>817</width>
-         <height>786</height>
+         <height>755</height>
         </rect>
        </property>
       </widget>
@@ -460,9 +471,15 @@
     <item>
      <widget class="QTabWidget" name="InventoryTab">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="all_items">
+       <property name="maximumSize">
+        <size>
+         <width>803</width>
+         <height>535</height>
+        </size>
+       </property>
        <attribute name="title">
         <string>전체</string>
        </attribute>
@@ -475,20 +492,59 @@
           <height>541</height>
          </rect>
         </property>
+        <property name="maximumSize">
+         <size>
+          <width>811</width>
+          <height>541</height>
+         </size>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="armor_items">
+       <property name="maximumSize">
+        <size>
+         <width>803</width>
+         <height>535</height>
+        </size>
+       </property>
        <attribute name="title">
         <string>장비</string>
        </attribute>
        <widget class="QTableWidget" name="ArmorTable">
         <property name="geometry">
          <rect>
-          <x>-5</x>
-          <y>-9</y>
+          <x>-2</x>
+          <y>-1</y>
+          <width>811</width>
+          <height>541</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
           <width>821</width>
           <height>551</height>
+         </size>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="consumable_items">
+       <attribute name="title">
+        <string>소모품</string>
+       </attribute>
+       <widget class="QTableWidget" name="ConsumableTable">
+        <property name="geometry">
+         <rect>
+          <x>-2</x>
+          <y>-1</y>
+          <width>811</width>
+          <height>541</height>
          </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>821</width>
+          <height>551</height>
+         </size>
         </property>
        </widget>
       </widget>

@@ -57,12 +57,14 @@ class LoadGameWindow(QStackedWidget,load_window):
     def setFixedSize(self, widgetList):
         for widget in widgetList:
             widget.setFixedSize(100,60)
-            
+    
+    # 캐릭터 삭제
     def delete_character(self, name):
         svld = SAVE_LOADS()  # 데이터 관리 객체
         svld.delete_player(name)
         self.load_character()  # 데이터 갱신 및 UI 업데이트
     
+    # 캐릭터로 게임 시작하기
     def start_game(self, name):
         self.parent.StartMain(name)
     
