@@ -1,9 +1,10 @@
-import sys
+
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QWidget, QStackedWidget
-import os
-from saves.save_loads import SAVE_LOADS
-from unit.player.player import Player
+from PyQt5.QtWidgets import QMessageBox, QStackedWidget
+
+from data.save_load import Player_SAVELOAD
+from unit.player import Player
+
 
 new_window = uic.loadUiType("./UI/ui_files/new_game_ui.ui")[0]
 
@@ -13,6 +14,8 @@ class NewGameWindow(QStackedWidget,new_window):
         self.setupUi(self)  # UI 초기화
         self.set_class = None
         self.parent = parent
+        
+        self.player_svld = Player_SAVELOAD()
         
         # 클래스 목록 동기화
         self.syncClass()
@@ -38,11 +41,10 @@ class NewGameWindow(QStackedWidget,new_window):
         
     
         # 캐릭터 만들기
-        player = Player(name=self.name, CLASS=set_class)
-        data = player.get_status()
+        player = Player(name=self.name, class_=set_class, unit_type='player')
+        data = player.GetStatus()
         
-        svld = SAVE_LOADS()
-        character_exist = svld.data_add(data)
+        character_exist = self.player_svld.AddData(data)
         
         if character_exist == 1:
             QMessageBox.information(self, "Error", "닉네임이 이미 존재합니다.")

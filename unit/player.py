@@ -1,12 +1,15 @@
 from unit.character_class.warrior import Warrior
 from unit.unit import Unit
+from entity.money import Money
 
-class Player(Unit, Warrior):
+class Player(Unit, Warrior, Money):
     def __init__(self, name, unit_type, class_):
         # Unit 초기화
         Unit.__init__(self, name, unit_type)
         # Warrior 초기화
         Warrior.__init__(self)
+        # Money 초기화
+        Money.__init__(self)
         
         self.inventory = ['철 검', '철 갑옷', '하급 회복 물약', '철 반지', '철 반지', '미스릴 검']
         self.max_inventory_size = 0    # 최대 인벤토리 용량
@@ -40,6 +43,7 @@ class Player(Unit, Warrior):
         self.money = 1000
         
         self.lv = 1
+    
         
         self.SettingClass()
         self.ClacStat()
@@ -48,7 +52,7 @@ class Player(Unit, Warrior):
     def SettingClass(self):
         if self.class_ == '전사':
             stats = self.GetStatusWarrior()
-        # print(stats.get('AGI', 0))
+            
         self.STR += stats.get('STR', 0)
         self.AGI += stats.get('AGI', 0)
         self.INT += stats.get('INT', 0)
@@ -67,7 +71,7 @@ class Player(Unit, Warrior):
         self.attack_score = self.STR * 5
         self.defense_score = round(self.STR * 0.5)
         
-        self.max_inventory_size = self.STR * 0.5
+        self.max_inventory_size = self.STR * 0.5    # 인벤토리는 힘 스텟의 절반
         
     def displaystatus(self):
         print(f'name: {self.name}')
@@ -104,7 +108,41 @@ class Player(Unit, Warrior):
             'defense_score':self.defense_score,
             
             'inventory':self.inventory,
-            'max_inventory_size':self.max_inventory_size
+            'max_inventory_size':self.max_inventory_size,
+            
+            'hp': self.hp,
+            'mp': self.mp,
+            
+            'money': self.money,
+            'wear_armor': self.wear_armor
         }
         
         return stat
+    
+    def NowCharaterDatas(self):
+        datas = {
+            'name':self.name,
+            'lv':self.lv,
+            'class':self.class_,
+            
+            'STR':self.STR,
+            'AGI':self.AGI,
+            'INT':self.INT,
+            'LUCK':self.LUCK,
+            
+            'experience':self.experience,
+            'skillpoint':self.skillpoint,
+            
+            'attack_score':self.attack_score,
+            'defense_score':self.defense_score,
+            
+            'inventory':self.inventory,
+            'max_inventory_size':self.max_inventory_size,
+            
+            "wear_armor": self.wear_armor,
+            "skill_point": self.skillpoint,
+            "money": self.money,
+            "unit_type": self.unit_type
+        }
+        
+        return datas

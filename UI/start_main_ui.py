@@ -8,13 +8,15 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QTabWidget
     )
-from saves.save_loads import SAVE_LOADS
+from data.save_load import Player_SAVELOAD
+from data.item_data import Item_SAVELOAD
 from PyQt5.QtCore import Qt
 
-from unit.item import Item
-from unit.player.armor import Armor
-from unit.player.consum import Consum
 from .item_view_ui import ItemViewWindow
+
+from entity.item import Item
+from entity.armor import Armor
+from entity.consum import Consum
 
 form_class = uic.loadUiType("./UI/ui_files/start_game_main_ui.ui")[0]
 
@@ -27,9 +29,9 @@ class StartMainWindow(QMainWindow, form_class):
         self.parent = parent
         self.name = name
         
-        svld = SAVE_LOADS()
-        self.player_data = svld.player_load(name)
-        
+        self.player_svld = Player_SAVELOAD()
+        self.player_data = self.player_svld.LoadPlayer(name)
+        print(self.player_data)
         # print(self.player_data)
         
         # 버튼 연결        
@@ -47,7 +49,6 @@ class StartMainWindow(QMainWindow, form_class):
         self.int_label = self.findChild(QLabel, 'INT_LABEL')
         self.luck_label = self.findChild(QLabel, 'LUCK_LABEL')
         self.money_label = self.findChild(QLabel, 'MONEY_LABEL')
-        self.avoid_label = self.findChild(QLabel, 'AVOID_LABEL')
         self.attack_label = self.findChild(QLabel, 'ATTACK_LABEL')
         self.defense_label = self.findChild(QLabel, 'DEFENSE_LABEL')
         self.backpack_label = self.findChild(QLabel, 'BACKPACK_LABEL')
@@ -123,9 +124,9 @@ class StartMainWindow(QMainWindow, form_class):
     # 메인 창에서 캐릭터 데이터 입력하기
     def load_player_data(self):
         
-        self.lv_label.setText(str(self.player_data['LV']))
+        self.lv_label.setText(str(self.player_data['lv']))
         self.name_label.setText(str(self.player_data['name']))
-        self.class_label.setText(str(self.player_data['CLASS']))
+        self.class_label.setText(str(self.player_data['class']))
         self.hp_label.setText(str(self.player_data['hp']))
         self.mp_label.setText(str(self.player_data['mp']))
         self.str_label.setText(str(self.player_data['STR']))
@@ -133,7 +134,6 @@ class StartMainWindow(QMainWindow, form_class):
         self.int_label.setText(str(self.player_data['INT']))
         self.luck_label.setText(str(self.player_data['LUCK']))
         self.money_label.setText(str(self.player_data['money']))
-        self.avoid_label.setText(str(self.player_data['AVOID']))
         self.attack_label.setText(str(self.player_data['attack_score']))
         self.defense_label.setText(str(self.player_data['defense_score']))
         self.backpack_label.setText(self.player_data['wear_armor']['가방'])
@@ -160,10 +160,9 @@ class StartMainWindow(QMainWindow, form_class):
         self.consum_inventory_table_widget.setHorizontalHeaderLabels([
             "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
         ])
-        
-        # 현재 인벤토리에서 장비 아이템만 가져오기        
+
         armor_ = Consum()
-        wear_items = armor_.ConsumItem(self.player_inventory)
+        wear_items = armor_.OnlyConsumInventory(self.player_inventory)
         
         # 행 수 설정
         self.consum_inventory_table_widget.setRowCount(len(wear_items))
@@ -189,7 +188,9 @@ class StartMainWindow(QMainWindow, form_class):
     
     # 전체 아이템 데이터 만들기(테이블)
     def LoadAllInventory(self):
-        item = Item()
+        item_svld = Item_SAVELOAD()
+        datas = item_svld.SearchItemList(self.player_inventory)
+        
         
         self.inventory_table_widget.setColumnCount(5)  # 필요한 열 수
         self.inventory_table_widget.setHorizontalHeaderLabels([
@@ -206,28 +207,24 @@ class StartMainWindow(QMainWindow, form_class):
         self.inventory_table_widget.setColumnWidth(3, 40)  # 네 번째 열의 너비를 100px로 설정
         self.inventory_table_widget.setColumnWidth(4, 70)  # 다섯 번째 열의 너비를 100px로 설정
         
-        for row_index, item_1 in enumerate(self.player_inventory):
-            item_data = item.SearchItem(item_1)
-            
-            # 아이템 넣기
-            if item_data:
-                # Name
-                self.inventory_table_widget.setItem(row_index, 0, self.CantEdit(item_data['name']))
-                # Description
-                self.inventory_table_widget.setItem(row_index, 1, self.CantEdit(item_data['description']))
-                # Attack
-                self.inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(item_data['attack'])))
-                # Defense
-                self.inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense'])))
-                # Type
-                self.inventory_table_widget.setItem(row_index, 4, self.CantEdit(item_data['type']))
+        for row_index, item_data in enumerate(datas):
+            print(item_data)
+            # Name
+            self.inventory_table_widget.setItem(row_index, 0, self.CantEdit(item_data['name']))
+            # Description
+            self.inventory_table_widget.setItem(row_index, 1, self.CantEdit(item_data['description']))
+            # Attack
+            self.inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(item_data['attack'])))
+            # Defense
+            self.inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense'])))
+            # Type
+            self.inventory_table_widget.setItem(row_index, 4, self.CantEdit(item_data['type']))
     
     def LoadArmor(self):
         # 플레이어 착용 장비 가져오기
         player_armor = self.player_data['wear_armor']
         
         # 현재 착용하고 있는 데이터 넣기
-        
         self.helmat_label.setText(player_armor['투구'])
         self.neck_label.setText(player_armor['목걸이'])
         self.armor_label.setText(player_armor['갑옷'])

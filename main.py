@@ -1,7 +1,3 @@
-# from unit.player import Player
-# from display.display_select import MainDisplay
-# from game.main_game import MAIN_GAME
-
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 
@@ -23,13 +19,13 @@ class MainWindow(QMainWindow):
 
         # 페이지 추가
         self.main_menu = MainMenu(self)
-        self.load_game = LoadGameWindow(self)
         self.new_game = NewGameWindow(self)
+        self.load_game = LoadGameWindow(self)
         
         # 페이지 연결하기
         self.stackedWidget.addWidget(self.main_menu)    # 메인 페이지
-        self.stackedWidget.addWidget(self.load_game)    # 캐릭터 로드
         self.stackedWidget.addWidget(self.new_game)     # 새로 만들기
+        self.stackedWidget.addWidget(self.load_game)    # 캐릭터 로드
 
         # 기본 페이지 설정
         self.stackedWidget.setCurrentWidget(self.main_menu)
@@ -39,6 +35,7 @@ class MainWindow(QMainWindow):
 
     # 로드 페이지로 가기
     def LoadGame(self):
+        # self.load_game.__init__()
         self.load_game.load_character()
         self.stackedWidget.setCurrentWidget(self.load_game)
     

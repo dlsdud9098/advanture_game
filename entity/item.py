@@ -24,6 +24,16 @@ class Item(Item_SAVELOAD):
         self.drop = drop
         self.type = type
         
+        # self.item_name = None
+        # self.item_description = None
+        # self.attack = None
+        # self.defense = None
+        # self.hp = None
+        # self.mp = None
+        # self.stat = None
+        # self.drop = None
+        # self.type = None
+        
         self.ItemSave()
         
     # 아이템 추가하기

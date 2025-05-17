@@ -4,7 +4,6 @@ import os
 class Player_SAVELOAD:
     def __init__(self):
         self.player_data_path = './data/data_files/player_datas.player'
-        # self.player_data_path = './dat'
         
         if (not os.path.exists(self.player_data_path)) or (os.path.getsize(self.player_data_path) == 0):
             self.SaveData({})
@@ -25,6 +24,10 @@ class Player_SAVELOAD:
         datas = self.LoadData()
         if data['name'] in datas.keys():    # 새로 만든 캐릭터의 닉네임이 이미 존재함
             print('이미 존재하는 닉네임입니다.')
+            return 1
+        elif len(datas) > 5:
+            print('생성 개수를 초과하였습니다.')
+            return 2
         else:
             datas[data['name']] = data
             
@@ -42,6 +45,8 @@ class Player_SAVELOAD:
     # 플레이어 불러오기
     def LoadPlayer(self, name):
         datas = self.LoadData()
-        self.player_data = datas['name']
+        # print(datas)
+        self.player_data = datas[name]
+        # print(self.player_data)
         
         return self.player_data

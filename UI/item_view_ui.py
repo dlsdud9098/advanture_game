@@ -8,10 +8,11 @@ from PyQt5.QtWidgets import (
     QDialog,
     QHeaderView
     )
-from saves.save_loads import SAVE_LOADS
+from data.item_data import Item_SAVELOAD
 from PyQt5.QtCore import Qt
 
-from unit.item import Item
+# from unit.item import Item
+from entity.item import Item
 
 form_class = uic.loadUiType("./UI/ui_files/item_view_ui.ui")[0]
 

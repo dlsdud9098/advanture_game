@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
     )
 import os
 
-from saves.save_loads import SAVE_LOADS
+from data.save_load import Player_SAVELOAD
 
 load_window = uic.loadUiType("./UI/ui_files/character_load_ui.ui")[0]
 
@@ -18,7 +18,8 @@ class LoadGameWindow(QStackedWidget,load_window):
         super().__init__()
         self.setupUi(self)  # UI 초기화
         
-        self.SyncData()
+        self.player_svld = Player_SAVELOAD()
+        # self.SyncData()
         self.parent = parent
         
         self.character_load_layout = self.findChild(QVBoxLayout, "character_load_layout")
@@ -26,11 +27,9 @@ class LoadGameWindow(QStackedWidget,load_window):
         # 뒤로가기 버튼 연결하기
         self.BACK_BTN.clicked.connect(self.BackPage)
         
-        # self.load_character()
         
     def SyncData(self):
-        svld = SAVE_LOADS()
-        datas = svld.data_load()
+        datas = self.player_svld.data_load()
         
     # 뒤로 가기(메인 페이지)
     def BackPage(self):
@@ -60,8 +59,8 @@ class LoadGameWindow(QStackedWidget,load_window):
     
     # 캐릭터 삭제
     def delete_character(self, name):
-        svld = SAVE_LOADS()  # 데이터 관리 객체
-        svld.delete_player(name)
+        # 데이터 관리 객체
+        self.player_svld.DeleteData(name)
         self.load_character()  # 데이터 갱신 및 UI 업데이트
     
     # 캐릭터로 게임 시작하기
@@ -81,9 +80,9 @@ class LoadGameWindow(QStackedWidget,load_window):
         charater_layout.addWidget(image_label, 0, 0, 3, 1)  # rowSpan 3, colSpan 1로 설정
 
         # 데이터 라벨
-        lv_label = QLabel(f"LV: {data['LV']}")
+        lv_label = QLabel(f"LV: {data['lv']}")
         name_label = QLabel(f"Name: {data['name']}")
-        class_label = QLabel(f"class: {data['CLASS']}")
+        class_label = QLabel(f"class: {data['class']}")
 
         # 라벨을 1번째 열에 추가
         charater_layout.addWidget(lv_label, 0, 1)
@@ -140,10 +139,7 @@ class LoadGameWindow(QStackedWidget,load_window):
         grid_widget = QWidget()
         grid_widget.setLayout(charater_layout)
         grid_widget.setMaximumSize(1000, 200)
-
-        # QWidget에 테두리 스타일 추가
-        # grid_widget.setStyleSheet("border: 1px solid black;")  # 테두리 추가
-
+        
         # 레이아웃 추가
         self.character_load_layout.addWidget(grid_widget)
     
@@ -151,9 +147,7 @@ class LoadGameWindow(QStackedWidget,load_window):
     def load_character(self):
         self.clear_layout(self.character_load_layout)
         
-        svld = SAVE_LOADS()
-        player_data = svld.data_load()
-
+        player_data = self.player_svld.LoadData()
         for data in player_data.values():
             self.create_character_widget(data)
         
