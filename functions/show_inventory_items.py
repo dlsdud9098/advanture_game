@@ -13,7 +13,9 @@ from PyQt5.QtCore import Qt
 from entity.armor import Armor
 from entity.consum import Consum
 
-class ShowInventoryItems:
+from data.item_data import Item_SAVELOAD
+
+class ShowInventoryItems(Item_SAVELOAD):
     
     # 모든 아이템 목록
     def AllInventoryItems(self, inventory_table_widget, inventory):
@@ -43,9 +45,7 @@ class ShowInventoryItems:
             inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense'])))
             # Type
             inventory_table_widget.setItem(row_index, 4, self.CantEdit(item_data['type']))
-            
-        
-        
+
         return inventory_table_widget
     
     # 장비 아이템 목록
@@ -90,7 +90,7 @@ class ShowInventoryItems:
 
         cnosum = Consum()
         consum_items = cnosum.OnlyConsumInventory(inventory)
-        print(consum_items)
+        # print(consum_items)
         
         # 행 수 설정
         consum_inventory_table_widget.setRowCount(len(consum_items))

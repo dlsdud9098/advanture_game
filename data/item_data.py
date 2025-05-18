@@ -54,7 +54,10 @@ class Item_SAVELOAD:
     # 아이템 검색(여러개)
     def SearchItemList(self, item_list):
         df = self.LoadData()
-        df = df[df['name'].isin(item_list)]
-        
-        df = df.to_dict(orient='records')
-        return df
+        result = []
+        for item_name in item_list:
+            match = df[df["name"] == item_name]  # 데이터프레임에서 아이템 검색
+            if not match.empty:
+                result.append(match.iloc[0].to_dict())  # 딕셔너리 형태로 데이터 가져오기
+                
+        return result

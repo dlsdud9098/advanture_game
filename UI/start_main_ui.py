@@ -38,6 +38,7 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
         self.ConnectInventoryTab()
         self.ConnectPlayerData()
         
+        
     # UI 위젯 연결하기
     def ConnectWidget(self):
         # 버튼 연결        
@@ -97,6 +98,7 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
         
     # 인벤토리 위젯 연결하기
     def ConnectInventoryTab(self):
+        # 탭 변경 시그널 연결
         self.inventory_tab = self.findChild(QTabWidget, 'InventoryTab')
         self.inventory_tab.currentChanged.connect(self.on_tab_changed)
         
@@ -165,18 +167,18 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
     
     # 인벤토리 전체
     def AllInventory(self):
-        player_inventory = self.SearchItemList(self.player_data['inventory'])
-        self.inventory_table_widget = self.AllInventoryItems(self.inventory_table_widget, player_inventory)
+        inventory_items = self.SearchItemList(self.player_data['inventory'])
+        self.inventory_table_widget = self.AllInventoryItems(self.inventory_table_widget, inventory_items)
     
     # 인벤토리 장비만
     def ArmorInventory(self):
-        player_inventory = self.SearchItemList(self.player_data['inventory'])
-        self.armor_inventory_table_widget = self.ArmorInventoryItems(self.armor_inventory_table_widget, player_inventory)
+        inventory_items = self.SearchItemList(self.player_data['inventory'])
+        self.armor_inventory_table_widget = self.ArmorInventoryItems(self.armor_inventory_table_widget, inventory_items)
         
     # 인벤토리 소모품만
     def ConsumInventory(self):
-        player_inventory = self.SearchItemList(self.player_data['inventory'])
-        self.consum_inventory_table_widget = self.ConsumInventoryItems(self.consum_inventory_table_widget, player_inventory)
+        inventory_items = self.SearchItemList(self.player_data['inventory'])
+        self.consum_inventory_table_widget = self.ConsumInventoryItems(self.consum_inventory_table_widget, inventory_items)
     
     # 인벤토리에서 우클릭 시
     def ShowRightClick(self, pos):
@@ -189,15 +191,12 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
         row = item.row()
         item_name = self.inventory_table_widget.item(row, 0).text()  # 클릭한 아이템의 이름 가져오기
         item_data = self.SearchItem(item_name)
-        # item_data = item.SearchItem(item_name)
-        # print(item_data)
         type = item_data['type']
         
         # 메뉴 생성
         menu = QMenu(self)
         wearArmor = None
         useItem = None
-        # hands = None
         if type in ['갑옷', '바지', '신발', '반지','목걸이', '투구', '한 손 무기', '양손 무기']:
             if type == '반지' or type == '한 손 무기':
                 wearLeft = menu.addAction('왼손에 착용하기')
@@ -222,8 +221,8 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
         elif action == wearRight:
             # 아이템 제거
             self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='right')
-            # self.player_inventory.remove(item_data['name'])
-            # print(self.player_data)
+        elif action == useItem:
+            pass
         
         self.SyncData()
             
