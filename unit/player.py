@@ -25,7 +25,10 @@ class Player(Unit, Warrior, Money):
                 '갑옷': '비어있음',
                 '바지': '비어있음',
                 '신발': '비어있음',
-                '무기': '비어있음',
+                '무기': {
+                        '왼손': '비어있음',
+                        '오른손': '비어있음'
+                        },
                 '가방': '비어있음'
             }                
         self.class_ = class_            # 캐릭터의 클래스(직업)
@@ -71,7 +74,7 @@ class Player(Unit, Warrior, Money):
         self.attack_score = self.STR * 5
         self.defense_score = round(self.STR * 0.5)
         
-        self.max_inventory_size = self.STR * 0.5    # 인벤토리는 힘 스텟의 절반
+        self.max_inventory_size = int(self.STR * 0.5)    # 인벤토리는 힘 스텟의 절반
         
     def displaystatus(self):
         print(f'name: {self.name}')

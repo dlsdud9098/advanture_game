@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 from UI.main_menu_ui import MainMenu
 from UI.load_game_ui import LoadGameWindow
 from UI.new_game_ui import NewGameWindow
-from UI.start_main_ui import StartMainWindow
+from UI.start_main_ui2 import StartMainWindow
 
 # form_class = uic.loadUiType("./UI/ui_files/main.ui")[0]
 

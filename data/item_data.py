@@ -42,13 +42,14 @@ class Item_SAVELOAD:
 
     # 아이템 검색하기
     def SearchItem(self, name):
-        datas = self.LoadData()
+        df = self.LoadData()
         
-        if name in datas.keys():
-            data = datas[name]
-            return data
+        df = df[df['name'] == name]
+        if not df.empty:
+            df = df.to_dict(orient='records')[0]
+            return df
         else:
-            print("아이템이 목록에 없습니다.")
+            print('아이템이 목록에 없습니다.')
     
     # 아이템 검색(여러개)
     def SearchItemList(self, item_list):

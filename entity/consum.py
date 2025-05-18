@@ -6,9 +6,10 @@ class Consum(Item_SAVELOAD):
         
     # 소모품만 추출하기
     def OnlyConsumInventory(self, inventory):
-        datas = self.LoadData()
+        df = self.LoadData()
         
-        df = df[datas['name'].isin(inventory)]
+        df = df[df['type'] == '소모품']
+        
         datas = df.to_dict(orient='records')
         return datas
     

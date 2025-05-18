@@ -45,7 +45,6 @@ class Player_SAVELOAD:
     # 플레이어 불러오기
     def LoadPlayer(self, name):
         datas = self.LoadData()
-        # print(datas)
         self.player_data = datas[name]
         # print(self.player_data)
         

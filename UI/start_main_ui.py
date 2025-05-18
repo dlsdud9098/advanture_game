@@ -18,22 +18,28 @@ from entity.item import Item
 from entity.armor import Armor
 from entity.consum import Consum
 
+from functions.show_inventory_items import ShowInventoryItems
+
 form_class = uic.loadUiType("./UI/ui_files/start_game_main_ui.ui")[0]
 
-class StartMainWindow(QMainWindow, form_class):
+class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_SAVELOAD):
     def __init__(self, parent, name):
         super().__init__()
+        Item_SAVELOAD.__init__(self)
+        
         self.setupUi(self)
         self.load_ui = None
         
         self.parent = parent
-        self.name = name
         
-        self.player_svld = Player_SAVELOAD()
-        self.player_data = self.player_svld.LoadPlayer(name)
-        print(self.player_data)
-        # print(self.player_data)
+        self.player_data = Player_SAVELOAD().LoadPlayer(name)
+    
+        self.ConnectWidget()
+        self.ConnectInventoryTab()
+        self.ConnectPlayerData()
         
+    # UI 위젯 연결하기
+    def ConnectWidget(self):
         # 버튼 연결        
         self.SAVE_BTN.clicked.connect(self.CharacterSave)
         # self.Chat_Spend_BTN.clicked.connect(self.SpendChat)
@@ -52,28 +58,48 @@ class StartMainWindow(QMainWindow, form_class):
         self.attack_label = self.findChild(QLabel, 'ATTACK_LABEL')
         self.defense_label = self.findChild(QLabel, 'DEFENSE_LABEL')
         self.backpack_label = self.findChild(QLabel, 'BACKPACK_LABEL')
+        self.backpacksize_label = self.findChild(QLabel, 'BACKPACKSIZE_LABEL')
         
         # 캐릭터 장비 정보 넣기
         self.helmat_label = self.findChild(QLabel, 'HELMAT_LABEL')
+        self.helmat_label.setText('비어있음')
         self.neck_label = self.findChild(QLabel, 'NECK_LABEL')
+        self.neck_label.setText('비어있음')
         self.armor_label = self.findChild(QLabel, 'ARMOR_LABEL')
+        self.armor_label.setText('비어있음')
         self.leggings_label = self.findChild(QLabel, 'LEGGINGS_LABEL')
+        self.leggings_label.setText('비어있음')
         self.shose_label = self.findChild(QLabel, 'SHOSE_LABEL')
+        self.shose_label.setText('비어있음')
         self.ring1_label = self.findChild(QLabel, 'RING1_LABEL')
+        self.ring1_label.setText('비어있음')
         self.ring2_label = self.findChild(QLabel, 'RING2_LABEL')
+        self.ring2_label.setText('비어있음')
         self.weapon_right_label = self.findChild(QLabel, 'WEAPON_RIGHT_LABEL')
+        self.weapon_right_label.setText('비어있음')
         self.weapon_left_label = self.findChild(QLabel, 'WEAPON_LEFT_LABEL')
+        self.weapon_left_label.setText('비어있음')
         self.backpack_label_2 = self.findChild(QLabel, 'BACKPACK_LABEL_2')
-
-        self.name = None
-        # print(self.player_data)
-        self.player_inventory = self.player_data['inventory']
+        self.backpack_label_2.setText('비어있음')
         
-        # 인벤토리 탭 연결하기
-        # 탭 변경 시그널 연결
+        self.item_labels = {
+            '투구': self.helmat_label,
+            '목걸이': self.neck_label,
+            '갑옷': self.armor_label,
+            '바지': self.leggings_label,
+            '신발': self.shose_label,
+            '반지left': self.ring1_label,
+            '반지right': self.ring2_label,
+            '한 손 무기left': self.weapon_left_label,
+            '한 손 무기right': self.weapon_right_label,
+            '가방': self.backpack_label_2
+        }
+        
+    # 인벤토리 위젯 연결하기
+    def ConnectInventoryTab(self):
         self.inventory_tab = self.findChild(QTabWidget, 'InventoryTab')
         self.inventory_tab.currentChanged.connect(self.on_tab_changed)
-
+        
         # 테이블 위젯 연결하기
         self.inventory_table_widget = self.findChild(QTableWidget, 'InventoryTable')
         self.armor_inventory_table_widget = self.findChild(QTableWidget, 'ArmorTable')
@@ -89,44 +115,15 @@ class StartMainWindow(QMainWindow, form_class):
         self.armor_inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.armor_inventory_table_widget.customContextMenuRequested.connect(self.ShowRightClick)
         
-        self.consum_inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.consum_inventory_table_widget.customContextMenuRequested.connect(self.ShowRightClick)
+        # self.consum_inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.consum_inventory_table_widget.customContextMenuRequested.connect(self.ShowRightClick)
         
-        
-        self.load_player_data()
-        
-    def on_tab_changed(self, index):
-        """
-        탭 변경됨
-        """    
-        
-        # 전체 인벤토리
-        if index == 0:
-            self.LoadInventory('all')
-        elif index == 1:
-            self.LoadInventory('armor')
-        elif index == 2:
-            self.LoadInventory('consum')
-            
-    # 플레이어 정보에 대한 내용을 새로고침(업데이트) 합니다.
-    def refresh_widget(self):
-        # self.load_player_data()
-        self.LoadInventory('all')
-        self.LoadInventory('armor')
-        self.LoadInventory('consum')
-        # self.LoadArmor()
-        pass
     
-    def CharacterSave(self):
-        self.parent.switch_to_main_menu()
-        pass
-    
-    # 메인 창에서 캐릭터 데이터 입력하기
-    def load_player_data(self):
-        
+    # 플레이어 정보 연결하기
+    def ConnectPlayerData(self):
         self.lv_label.setText(str(self.player_data['lv']))
-        self.name_label.setText(str(self.player_data['name']))
-        self.class_label.setText(str(self.player_data['class']))
+        self.name_label.setText(self.player_data['name'])
+        self.class_label.setText(self.player_data['class'])
         self.hp_label.setText(str(self.player_data['hp']))
         self.mp_label.setText(str(self.player_data['mp']))
         self.str_label.setText(str(self.player_data['STR']))
@@ -137,15 +134,27 @@ class StartMainWindow(QMainWindow, form_class):
         self.attack_label.setText(str(self.player_data['attack_score']))
         self.defense_label.setText(str(self.player_data['defense_score']))
         self.backpack_label.setText(self.player_data['wear_armor']['가방'])
-        # self.backpack_label.setText(str(player_data))
+        self.backpacksize_label.setText(str(self.player_data['max_inventory_size']))
+        self.player_inventory = self.player_data['inventory']
         
-        # self.player_inventory = self.player_data['inventory']
-        
-        # 테이블 데이터 넣기
-        # self.LoadAllInventory()
-        self.LoadArmor()
-        self.LoadAllInventory()
     
+    # 캐릭터 저장하기(뒤로가기)
+    def CharacterSave(self):
+        self.parent.switch_to_main_menu()
+        
+    def on_tab_changed(self, index):
+        """
+        탭 변경됨
+        """    
+        pass
+        # 전체 인벤토리
+        if index == 0:
+            self.AllInventory()
+        elif index == 1:
+            self.ArmorInventory()
+        elif index == 2:
+            self.ConsumInventory()
+        
     # 테이블 데이터 선택 못하게 하기
     def CantEdit(self, data):
         # Name
@@ -154,88 +163,22 @@ class StartMainWindow(QMainWindow, form_class):
         item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # 수정 불가능
         return item
     
-    # 소모품 아이템 테이블
-    def LoadConsumInventory(self):
-        self.consum_inventory_table_widget.setColumnCount(5)  # 필요한 열 수
-        self.consum_inventory_table_widget.setHorizontalHeaderLabels([
-            "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
-        ])
-
-        armor_ = Consum()
-        wear_items = armor_.OnlyConsumInventory(self.player_inventory)
-        
-        # 행 수 설정
-        self.consum_inventory_table_widget.setRowCount(len(wear_items))
-        self.consum_inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # 열의 크기 조절
-        self.consum_inventory_table_widget.setColumnWidth(0, 250)  # 첫 번째 열의 너비를 150px로 설정
-        self.consum_inventory_table_widget.setColumnWidth(1, 300)   # 두 번째 열의 너비를 50px로 설정
-        self.consum_inventory_table_widget.setColumnWidth(2, 40)  # 네 번째 열의 너비를 100px로 설정
-        self.consum_inventory_table_widget.setColumnWidth(3, 40)  # 네 번째 열의 너비를 100px로 설정
-        self.consum_inventory_table_widget.setColumnWidth(4, 70)  # 다섯 번째 열의 너비를 100px로 설정
-        
-        for row_index, wear_item in enumerate(wear_items):
-            # Name
-                self.consum_inventory_table_widget.setItem(row_index, 0, self.CantEdit(wear_item['name']))
-                # Description
-                self.consum_inventory_table_widget.setItem(row_index, 1, self.CantEdit(wear_item['description']))
-                # Attack
-                self.consum_inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(wear_item['attack'])))
-                # Defense
-                self.consum_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['defense'])))
-                # Type
-                self.consum_inventory_table_widget.setItem(row_index, 4, self.CantEdit(wear_item['type']))
+    # 인벤토리 전체
+    def AllInventory(self):
+        player_inventory = self.SearchItemList(self.player_data['inventory'])
+        self.inventory_table_widget = self.AllInventoryItems(self.inventory_table_widget, player_inventory)
     
-    # 전체 아이템 데이터 만들기(테이블)
-    def LoadAllInventory(self):
-        item_svld = Item_SAVELOAD()
-        datas = item_svld.SearchItemList(self.player_inventory)
+    # 인벤토리 장비만
+    def ArmorInventory(self):
+        player_inventory = self.SearchItemList(self.player_data['inventory'])
+        self.armor_inventory_table_widget = self.ArmorInventoryItems(self.armor_inventory_table_widget, player_inventory)
         
-        
-        self.inventory_table_widget.setColumnCount(5)  # 필요한 열 수
-        self.inventory_table_widget.setHorizontalHeaderLabels([
-            "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
-        ])
-        
-        # 행 수 설정
-        self.inventory_table_widget.setRowCount(len(self.player_inventory))
-        self.inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # 열의 크기 조절
-        self.inventory_table_widget.setColumnWidth(0, 250)  # 첫 번째 열의 너비를 150px로 설정
-        self.inventory_table_widget.setColumnWidth(1, 300)   # 두 번째 열의 너비를 50px로 설정
-        self.inventory_table_widget.setColumnWidth(2, 40)  # 네 번째 열의 너비를 100px로 설정
-        self.inventory_table_widget.setColumnWidth(3, 40)  # 네 번째 열의 너비를 100px로 설정
-        self.inventory_table_widget.setColumnWidth(4, 70)  # 다섯 번째 열의 너비를 100px로 설정
-        
-        for row_index, item_data in enumerate(datas):
-            print(item_data)
-            # Name
-            self.inventory_table_widget.setItem(row_index, 0, self.CantEdit(item_data['name']))
-            # Description
-            self.inventory_table_widget.setItem(row_index, 1, self.CantEdit(item_data['description']))
-            # Attack
-            self.inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(item_data['attack'])))
-            # Defense
-            self.inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense'])))
-            # Type
-            self.inventory_table_widget.setItem(row_index, 4, self.CantEdit(item_data['type']))
+    # 인벤토리 소모품만
+    def ConsumInventory(self):
+        player_inventory = self.SearchItemList(self.player_data['inventory'])
+        self.consum_inventory_table_widget = self.ConsumInventoryItems(self.consum_inventory_table_widget, player_inventory)
     
-    def LoadArmor(self):
-        # 플레이어 착용 장비 가져오기
-        player_armor = self.player_data['wear_armor']
-        
-        # 현재 착용하고 있는 데이터 넣기
-        self.helmat_label.setText(player_armor['투구'])
-        self.neck_label.setText(player_armor['목걸이'])
-        self.armor_label.setText(player_armor['갑옷'])
-        self.leggings_label.setText(player_armor['바지'])
-        self.shose_label.setText(player_armor['신발'])
-        self.ring1_label.setText(player_armor['반지']['왼손'])
-        self.ring2_label.setText(player_armor['반지']['오른손'])
-        self.weapon_right_label.setText(player_armor['무기'])
-        self.weapon_left_label.setText(player_armor['무기'])
-        self.backpack_label_2.setText(player_armor['가방'])
-        
+    # 인벤토리에서 우클릭 시
     def ShowRightClick(self, pos):
         # 마우스 위치에 따라 메뉴 생성
         item = self.inventory_table_widget.itemAt(pos)
@@ -244,21 +187,21 @@ class StartMainWindow(QMainWindow, form_class):
         
         # 우클릭한 아이템 좌표
         row = item.row()
-        column = item.column()
         item_name = self.inventory_table_widget.item(row, 0).text()  # 클릭한 아이템의 이름 가져오기
-        
-        item = Item()
-        item_data = item.SearchItem(item_name)
+        item_data = self.SearchItem(item_name)
+        # item_data = item.SearchItem(item_name)
+        # print(item_data)
         type = item_data['type']
         
         # 메뉴 생성
         menu = QMenu(self)
         wearArmor = None
         useItem = None
-        if type in ['갑옷', '바지', '신발', '반지','목걸이', '투구', '무기']:
-            if type == '반지':
-                wearRing1 = menu.addAction('왼손에 착용하기')
-                wearRing2 = menu.addAction('오른손에 착용하기')
+        # hands = None
+        if type in ['갑옷', '바지', '신발', '반지','목걸이', '투구', '한 손 무기', '양손 무기']:
+            if type == '반지' or type == '한 손 무기':
+                wearLeft = menu.addAction('왼손에 착용하기')
+                wearRight = menu.addAction('오른손에 착용하기')
             else:
                 # 장비 아이템
                 wearArmor = menu.addAction("착용하기")
@@ -266,236 +209,26 @@ class StartMainWindow(QMainWindow, form_class):
             useItem = menu.addAction("사용하기")
             
         view_item = menu.addAction("아이템 상세보기")
-
+        
         # 선택된 메뉴 항목 처리
         action = menu.exec_(self.inventory_table_widget.viewport().mapToGlobal(pos))
-        print(action)
+        
         if action == None: # 선택 안함
             pass
         elif action == wearArmor:   # 장비 착용
+            self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels)
+        elif action == wearLeft:
+            self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='left')
+        elif action == wearRight:
             # 아이템 제거
-            self.player_inventory.remove(item_data['name'])
-            self.WearArmor(item_data, item_data['type'])
-        elif action == useItem:         # 소모품 사용하기
-            print("UseItem selected")
-        elif action == view_item:       # 아이템 상세보기
-            self.show_item_detail(item_data)
-        elif action == wearRing1:       # 왼손에 반지 착용
-            # 아이템 제거
-            self.player_inventory.remove(item_data['name'])
-            self.WearArmor(item_data, item_data['type'], 'left')
-        elif action == wearRing2:       # 오른손에 반지 착용
-            # 아이템 제거
-            self.player_inventory.remove(item_data['name'])
-            self.WearArmor(item_data, item_data['type'], 'right')
+            self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='right')
+            # self.player_inventory.remove(item_data['name'])
+            # print(self.player_data)
+        
+        self.SyncData()
             
-        self.refresh_widget()
-    
-    def show_item_detail(self, item_data):
-        # 아이템 상세보기 다이얼로그 생성
-        detail_dialog = ItemViewWindow(item_data, self)
-        detail_dialog.exec_()    # 모달 창으로 실행
-    
-    # 장비 착용
-    def WearArmor(self, item_data, item_type, hands = None):
-        item_name = item_data['name']
-        armor_func = {
-            '투구': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, item_data=item_data), # wear_armor 업데이트
-                lambda: self.helmat_label.setText(item_name)    #  armor 상태에 넣기
-            ],
-            '목걸이': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, item_data=item_data), # wear_armor 업데이트
-                lambda: self.neck_label.setText(item_name)    #  armor 상태에 넣기
-            ],
-            '갑옷': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, item_data=item_data), # wear_armor 업데이트
-                lambda: self.armor_label.setText(item_name)    #  armor 상태에 넣기
-            ],
-            '바지': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, item_data=item_data), # wear_armor 업데이트
-                lambda: self.leggings_label.setText(item_name)    #  armor 상태에 넣기
-            ],
-            '신발': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, item_data=item_data), # wear_armor 업데이트
-                lambda: self.shose_label.setText(item_name)    #  armor 상태에 넣기
-            ],
-            '반지': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, hands, item_data=item_data), # wear_armor 업데이트
-                lambda: self.wear_ring(item_name, hands)
-            ],
-            '무기': [
-                lambda: self.AddStatArmor(item_data),
-                lambda: self.set_wear_armor(item_type, item_name, item_data=item_data), # wear_armor 업데이트
-                lambda: self.weapon_right_label.setText(item_name)    #  armor 상태에 넣기
-            ],
-            
-        }
-        
-        if item_type in armor_func:
-            for func in armor_func[item_type]:
-                func()  # 리스트의 모든 함수 실행
-        else:
-            print(f"Unsupported armor type: {item_type}")
-        self.load_player_data()
-        
-    # 헬퍼 함수 추가
-    def set_wear_armor(self, armor_type, item_name, hands = None, item_data=None):
-        item = Item()
-        item.SearchItem(item_name)
-        
-        if armor_type == '반지':
-            if hands == 'left':
-                if self.player_data['wear_armor'][armor_type]['왼손'] == '비어있음':
-                    self.player_data['wear_armor'][armor_type]['왼손']= item_name
-                else:
-                    prev_item_name = self.ring1_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type]['왼손']= item_name
-                    
-            else:
-                if self.player_data['wear_armor'][armor_type]['오른손'] == '비어있음':
-                    self.player_data['wear_armor'][armor_type]['오른손']= item_name
-                else:
-                    prev_item_name = self.ring2_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type]['오른손']= item_name
-        else:
-            if self.player_data['wear_armor'][armor_type] == '비어있음':
-                self.player_data['wear_armor'][armor_type] = item_name
-            else:
-                if armor_type == '투구':
-                    prev_item_name = self.helmat_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type] = item_name
-                elif armor_type == '갑옷':
-                    prev_item_name = self.armor_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type] = item_name
-                elif armor_type == '바지':
-                    prev_item_name = self.leggings_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type] = item_name
-                elif armor_type == '신발':
-                    prev_item_name = self.shose_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type] = item_name
-                elif armor_type == '목걸이':
-                    prev_item_name = self.neck_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type] = item_name
-                elif armor_type == '무기':
-                    prev_item_name = self.weapon_right_label.text()
-                    self.player_inventory.append(prev_item_name)
-                    item_data = item.SearchItem(prev_item_name)
-                    
-                    self.SubStatArmor(item_data)
-                    self.player_data['wear_armor'][armor_type] = item_name
-    
-    # 반지 착용
-    def wear_ring(self, item_name, hands):
-        if hands == 'left':
-            self.ring1_label.setText(item_name)
-        else:
-            self.ring2_label.setText(item_name)
-    
-    # 착용한 장비에 대한 스텟 변화
-    def AddStatArmor(self, item_data):
-        # print(item_data['required_stat'].get('STR', 0))
-        self.player_data['STR'] += item_data['stat'].get('STR', 0)
-        self.player_data['AGI'] += item_data['stat'].get('AGI', 0)
-        self.player_data['INT'] += item_data['stat'].get('INT', 0)
-        self.player_data['LUCK'] += item_data['stat'].get('LUCK', 0)
-        self.player_data['attack_score'] += item_data.get('attack', 0)
-        self.player_data['defense_score'] += item_data.get('defense', 0)
-        self.player_data['hp'] += item_data.get('hp', 0)
-        self.player_data['mp'] += item_data.get('mp', 0)
-    
-    # 장비 벗었을 때 스텟 변화
-    def SubStatArmor(self, item_data):
-        self.player_data['STR'] -= item_data['stat'].get('STR', 0)
-        self.player_data['AGI'] -= item_data['stat'].get('AGI', 0)
-        self.player_data['INT'] -= item_data['stat'].get('INT', 0)
-        self.player_data['LUCK'] -= item_data['stat'].get('LUCK', 0)
-        self.player_data['attack_score'] -= item_data.get('attack', 0)
-        self.player_data['defense_score'] -= item_data.get('defense', 0)
-        self.player_data['hp'] -= item_data.get('hp', 0)
-        self.player_data['mp'] -= item_data.get('mp', 0)
-    
-    def UpdatePlayerData(self):
-        pass
-    
-    # 인벤토리에서 장비 탭
-    def LoadInventoryArmor(self):        
-        self.armor_inventory_table_widget.setColumnCount(6)  # 필요한 열 수
-        self.armor_inventory_table_widget.setHorizontalHeaderLabels([
-            "상태", "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
-        ])
-        
-        # 현재 인벤토리에서 장비 아이템만 가져오기        
-        armor_ = Armor()
-        wear_items = armor_.CanWearItem(self.player_inventory)
-        
-        # 행 수 설정
-        self.armor_inventory_table_widget.setRowCount(len(wear_items))
-        self.armor_inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        
-        for row_index, wear_item in enumerate(wear_items):
-            # Name
-            self.armor_inventory_table_widget.setItem(row_index, 0, self.CantEdit('*'))
-            # Name
-            self.armor_inventory_table_widget.setItem(row_index, 1, self.CantEdit(wear_item['name']))
-            # Description
-            self.armor_inventory_table_widget.setItem(row_index, 2, self.CantEdit(wear_item['description']))
-            # Attack
-            self.armor_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['attack'])))
-            # Defense
-            self.armor_inventory_table_widget.setItem(row_index, 4, self.CantEdit(str(wear_item['defense'])))
-            # Type
-            self.armor_inventory_table_widget.setItem(row_index, 5, self.CantEdit(wear_item['type']))
-        
-        self.set_column_weights(self.armor_inventory_table_widget, [1, 2, 10, 1, 1, 1])    
-        
-    def set_column_weights(self, table_widget, weights):
-        temp = 0
-        # 각 열의 비율에 따라 크기 설정
-        for i, weight in enumerate(weights):
-            a = int(table_widget.width()*(weight/sum(weights)))-3
-            temp += a
-            table_widget.setColumnWidth(i, a)
-        # print(temp, table_widget.width())
-    
-    def LoadInventory(self, type):
-        if type == 'all':   
-            self.LoadAllInventory()
-        elif type == 'armor':
-            self.LoadInventoryArmor()
-        elif type == 'consum':
-            self.LoadConsumInventory()
+    def SyncData(self):
+        self.ConnectPlayerData()
+        self.AllInventory()
+        self.ArmorInventory()
+        self.ConsumInventory()

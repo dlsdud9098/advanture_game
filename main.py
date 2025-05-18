@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
 
 from UI.main_menu_ui import MainMenu
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         # self.start_main.load_player_data(name)
 
 if __name__ == "__main__":    
+    os.system('clear')
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
