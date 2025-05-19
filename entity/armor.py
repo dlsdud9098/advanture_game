@@ -12,72 +12,111 @@ class Armor(Item_SAVELOAD):
         for items in inventory:
             if items['type'] in self.armor_tags:
                 results.append(items)
-        print(results)
+        
         return results
     
     # 장비 장착하기 함수
     def WearArmor(self, item_data, item_type, player_data, item_labels, hands=''):
         self.player_data = player_data
-        
-        # print(item_data)
+        self.labels = item_labels
         
         self.AddStatArmor(item_data)
-        self.SetWearArmor(item_type, item_data, hands)
-        item_labels[item_type+hands].setText(item_data['name'])
+        self.UnWearArmor(item_data=item_data, hands=hands)
         
+        if item_type == '반지':
+            self.WearArmorRing(item_data, hands)
+        elif item_type in ['양손 무기', '한 손 무기']:
+            self.WearArmorWeapon(item_data, hands)
+        else:
+            self.SetWearArmor(item_data)
+            
         return self.player_data
         
     # 장비 장착 해제하기 함수
-    def UnWearArmor(self, item_data, item_type, player_data, item_labels, hands=''):
-        self.player_data = player_data
-        
+    def UnWearArmor(self, item_data, hands = ''):
+        if item_data['type'] in ['반지', '한 손 무기']:
+            item_type = '무기' if item_data['type'] == '한 손 무기' else '반지'
+            
+            hands_key = '왼손' if hands == 'left' else '오른손'
+            
+            # 현재 착용하고 있는 무기가 양손 무기일 때
+            if item_type == '무기':
+                left_item = self.player_data['wear_armor'][item_type]['왼손']
+                right_item = self.player_data['wear_armor'][item_type]['오른손']
+                
+                print(left_item, right_item)
+                if left_item == right_item:
+                    self.player_data['wear_armor'][item_type]['왼손'] = '비어있음'
+                    self.player_data['wear_armor'][item_type]['오른손'] = '비어있음'
+                    
+                    self.labels[item_type+'left'].setText('비어있음')
+                    self.labels[item_type+'right'].setText('비어있음')
+                    return
+                
+            # 양손 무기가 아닌 한 손 무기, 반지일 때
+            self.player_data['wear_armor'][item_type][hands_key] = '비어있음'
+            self.player_data['inventory'].append(item_data['name'])    
+            self.labels[item_type+hands].setText('비어있음')
+        elif item_data['type'] == '양손 무기':
+            item_type = '무기'
+            for hand in ['왼손', '오른손']:
+                self.player_data['wear_armor'][item_type][hand] = '비어있음'
+                
+            self.labels[item_type+'left'].setText('비어있음')
+            self.labels[item_type+'right'].setText('비어있음')
+        else:
+            if self.player_data['wear_armor'][item_data['type']] != '비어있음':
+                self.player_data['wear_armor'][item_data['type']] = '비어있음'
+                self.player_data['inventory'].append(item_data['name'])
+            self.labels[item_data['type']].setText('비어있음')
         
     # 장비 스텟 더하기(장착)
     def AddStatArmor(self, item_data):
-        self.player_data['STR'] += item_data['up_stat'].get('STR', 0)
-        self.player_data['AGI'] += item_data['up_stat'].get('AGI', 0)
-        self.player_data['INT'] += item_data['up_stat'].get('INT', 0)
-        self.player_data['LUCK'] += item_data['up_stat'].get('LUCK', 0)
-        self.player_data['attack_score'] += item_data.get('attack', 0)
-        self.player_data['defense_score'] += item_data.get('defense', 0)
-        self.player_data['hp'] += item_data.get('hp', 0)
-        self.player_data['mp'] += item_data.get('mp', 0)
-
-    # 장비 착용하기
-    def SetWearArmor(self, item_type, item, hands = None):
-        # item = self.SearchItem(item_data['name'])
-        # print(item, item_type)
-        if item_type == '반지' or item_type == '한 손 무기':
-            hands_key = '왼손' if hands == 'left' else '오른손'
-            item_type = '무기' if item_type == '한 손 무기' else '반지'
-            if self.player_data['wear_armor'][item_type][hands_key] == '비어있음':
-                self.player_data['inventory'].remove(item['name'])
-            else:
-                self.player_data['inventory'].append(self.player_data['wear_armor'][item_type][hands_key])
-                
-            self.player_data['wear_armor'][item_type][hands_key] = item['name']
-                
-                
-        else:
-            if self.player_data['wear_armor'].get(item_type) == '비어있음':                
-                # print(f"before: {self.player_data['inventory']}")
-                self.player_data['inventory'].remove(item['name'])
-                # print(f"after: {self.player_data['inventory']}")
-            else:
-                self.player_data['inventory'].append(self.player_data['wear_armor'][item_type])
-            self.player_data['wear_armor'][item_type] = item['name']
-            # print(self.player_data)
+        for stat in ['STR', 'AGI', 'INT', 'LUCK']:
+            self.player_data[stat] += item_data.get('up_stat', {}).get(stat, 0)
             
+        for stat in ['attack_score', 'defense_score', 'hp', 'mp']:
+            self.player_data[stat] += item_data.get(stat, 0)
+
+    # 반지 착용하기
+    def WearArmorRing(self, item, hands):
+        hands_key = '왼손' if hands == 'left' else '오른손'
+        
+        self.player_data['wear_armor'][item['type']][hands_key] = item['name']
+        self.player_data['inventory'].remove(item['name'])
+        self.labels[item['type']+hands].setText(item['name'])
+        
+    def WearArmorWeapon(self, item, hands = ''):
+        if item['type'] == '양손 무기':
+            item_type = '무기'
+            
+            self.player_data['wear_armor'][item_type]['왼손'] = item['name']
+            self.player_data['wear_armor'][item_type]['오른손'] = item['name']
+            
+            self.labels[item_type+'left'].setText(item['name'])
+            self.labels[item_type+'right'].setText(item['name'])
+        else:
+            item_type = '무기'
+            hands_key = '왼손' if hands == 'left' else '오른손'
+            
+            self.player_data['wear_armor'][item_type][hands_key] = item['name']
+
+            self.labels[item_type+hands].setText(item['name'])
+        self.player_data['inventory'].remove(item['name'])
+        
+    # 장비 착용하기
+    def SetWearArmor(self,item):
+        self.player_data['wear_armor'][item['type']] = item['name']
+        self.labels[item['type']].setText(item['name'])
+        self.player_data['inventory'].remove(item['name'])
+                
     # 장비 스텟 빼기(장착 해제)
     def SubStatArmor(self, item_data):
-        self.player_data['STR'] -= item_data['up_stat'].get('STR', 0),
-        self.player_data['AGI'] -= item_data['up_stat'].get('AGI', 0),
-        self.player_data['INT'] -= item_data['up_stat'].get('INT', 0),
-        self.player_data['LUCK'] -= item_data['up_stat'].get('LUCK', 0),
-        self.player_data['attack_score'] -= item_data.get('attack', 0),
-        self.player_data['defense_score'] -= item_data.get('defense', 0),
-        self.player_data['hp'] -= item_data.get('hp', 0),
-        self.player_data['mp'] -= item_data.get('mp', 0)
+        for stat in ['STR', 'AGI', 'INT', 'LUCK']:
+            self.player_data[stat] -= item_data.get('up_stat', {}).get(stat, 0)
+            
+        for stat in ['attack_score', 'defense_score', 'hp', 'mp']:
+            self.player_data[stat] -= item_data.get(stat, 0)
     
     # 장비 장착 해제
     def SetUnWearArmor(self, item_type, item_data, hands = None):

@@ -40,9 +40,9 @@ class ShowInventoryItems(Item_SAVELOAD):
             # Description
             inventory_table_widget.setItem(row_index, 1, self.CantEdit(item_data['description']))
             # Attack
-            inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(item_data['attack'])))
+            inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(item_data['attack_score'])))
             # Defense
-            inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense'])))
+            inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense_score'])))
             # Type
             inventory_table_widget.setItem(row_index, 4, self.CantEdit(item_data['type']))
 
@@ -71,9 +71,9 @@ class ShowInventoryItems(Item_SAVELOAD):
             # Description
             armor_inventory_table_widget.setItem(row_index, 2, self.CantEdit(wear_item['description']))
             # Attack
-            armor_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['attack'])))
+            armor_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['attack_score'])))
             # Defense
-            armor_inventory_table_widget.setItem(row_index, 4, self.CantEdit(str(wear_item['defense'])))
+            armor_inventory_table_widget.setItem(row_index, 4, self.CantEdit(str(wear_item['defense_score'])))
             # Type
             armor_inventory_table_widget.setItem(row_index, 5, self.CantEdit(wear_item['type']))
         
@@ -108,9 +108,9 @@ class ShowInventoryItems(Item_SAVELOAD):
                 # Description
                 consum_inventory_table_widget.setItem(row_index, 1, self.CantEdit(wear_item['description']))
                 # Attack
-                consum_inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(wear_item['attack'])))
+                consum_inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(wear_item['attack_score'])))
                 # Defense
-                consum_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['defense'])))
+                consum_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['defense_score'])))
                 # Type
                 consum_inventory_table_widget.setItem(row_index, 4, self.CantEdit(wear_item['type']))
                 

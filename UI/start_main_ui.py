@@ -91,9 +91,10 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
             '신발': self.shose_label,
             '반지left': self.ring1_label,
             '반지right': self.ring2_label,
-            '한 손 무기left': self.weapon_left_label,
-            '한 손 무기right': self.weapon_right_label,
-            '가방': self.backpack_label_2
+            '무기left': self.weapon_left_label,
+            '무기right': self.weapon_right_label,
+            '가방': self.backpack_label_2,
+            '양손 무기': [self.weapon_left_label, self.weapon_right_label]
         }
         
     # 인벤토리 위젯 연결하기
@@ -143,12 +144,9 @@ class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_S
     # 캐릭터 저장하기(뒤로가기)
     def CharacterSave(self):
         self.parent.switch_to_main_menu()
-        
+    
+    # 탭 변경 됨
     def on_tab_changed(self, index):
-        """
-        탭 변경됨
-        """    
-        pass
         # 전체 인벤토리
         if index == 0:
             self.AllInventory()
