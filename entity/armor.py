@@ -19,6 +19,13 @@ class Armor(Item_SAVELOAD):
     def WearArmor(self, item_data, item_type, player_data, item_labels, hands=''):
         self.player_data = player_data
         self.labels = item_labels
+
+        if item_data['type'] in ['양손 무기', '한 손 무기']:
+            self.UnWearWeapon(hands, item_data)
+        elif item_data['type'] == '반지':
+            self.UnWearRing(hands)
+        else:
+            self.UnWearArmor(self, item_data)
         
         self.AddStatArmor(item_data)
         self.UnWearArmor(item_data=item_data, hands=hands)
@@ -31,7 +38,62 @@ class Armor(Item_SAVELOAD):
             self.SetWearArmor(item_data)
             
         return self.player_data
+
+    # 장비(무기, 반지 제외) 장착 해제
+    def UnWearArmor(self, item_data):
+        self.player_data['wear_armor'][item_data['type']] = '비어있음'
+        self.player_data['inventory'].append(item_data['type'])
+        self.labels[item_data['type']].setText('비어있음')
+
+    # 무기 장착 해제
+    def UnWearWeapon(self, hands, item_data):
+        hands_key = '왼손' if hands == 'left' else '오른손'
+        left_weapon = self.player_data['wear_armor']['무기']['왼손']
+        right_weapon = self.player_data['wear_armor']['무기']['오른손']
+
+        """
+        내가 장착하고자 하는 무기가 양손 무기다. => 현재 장착하고 있는 무기가 양손 무기일 때 => 양손의 무기를 모두 장착 해제한다.
+                                                현재 장착하고 있는 무기가 한 손 무기일 때 => 양손의 무기를 모두 장착 해제한다.
+        내가 장착하고자 하는 무기가 한 손 무기다. => 현재 장착하고 있는 무기가 양손 무기일 때 => 양손의 무기를 모두 장착 해제한다.
+                                                현재 장착하고 있는 무기가 한 손 무기일 때 => 양손의 무기를 모두 장착 해제한다.
+        """
+        # 내가 장착하고자 하는 무기가 양손 무기일 때
+        if item_data['type'] == '양손 무기':
+
+            # 현재 장착하고 있는 무기가 양손 무기일 때
+            if left_weapon == right_weapon:
+                self.player_data['inventory'].append(left_weapon)
+            # 현재 창착하고 있는 무기가 한 손 무기일 때
+            else:
+                self.player_data['inventory'].append(left_weapon)
+                self.player_data['inventory'].append(right_weapon)
+            
+            self.player_data['wear_armor']['무기']['왼손'] = '비어있음'
+            self.player_data['wear_armor']['무기']['오른손'] = '비어있음'
+            self.labels['무기left'].setText('비어있음')
+            self.labels['무기right'].setText('비어있음')
         
+        # 내가 장착하고자 하는 무기가 한 손 무기일 때
+        else:
+            if left_weapon == right_weapon:
+                print(item_data)
+                self.player_data['inventory'].append(left_weapon)
+
+                self.player_data['wear_armor']['무기']['왼손'] = '비어있음'
+                self.player_data['wear_armor']['무기']['오른손'] = '비어있음'
+                self.labels['무기left'].setText('비어있음')
+                self.labels['무기right'].setText('비어있음')
+            else:
+                current_weapon = self.player_data['wear_armor']['무기'][hands_key]
+                self.player_data['wear_armor']['무기'][hands_key] = '비어있음'
+                self.player_data['inventory'].append(current_weapon)
+
+                self.labels['무기'+hands].setText('비어있음')
+        
+    # 반지 장착 해제
+    def UnWearRing(self, hands):
+        pass
+
     # 장비 장착 해제하기 함수
     def UnWearArmor(self, item_data, hands = ''):
         if item_data['type'] in ['반지', '한 손 무기']:

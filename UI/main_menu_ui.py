@@ -1,32 +1,53 @@
 import sys
-from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import (
+    QApplication, 
+    QMainWindow, 
+    QMessageBox,
+    QPushButton, 
+)
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile
 
-
-
-form_class = uic.loadUiType("./UI/ui_files/main.ui")[0]
-
-class MainMenu(QMainWindow, form_class):
-    def __init__(self, parent):
-        super().__init__()
-        self.setupUi(self)
-        self.load_ui = None
-        
+class MainMenu(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.parent = parent
+
+        # .ui 파일 로드
+        loader = QUiLoader()
+        ui_file = QFile("./UI/ui_files/main.ui")
+        ui_file.open(QFile.ReadOnly)
+        self.ui = loader.load(ui_file, self)
+        ui_file.close()
+        
+        # self.setLayout(self.ui.layout())  # QDialog에 로드한 UI 배치
+        self.setCentralWidget(self.ui)
+
+        # UI 위젯을 멤버로 바로 할당 (예: NEWGAME_BTN)
+        self.NEWGAME_BTN = self.ui.findChild(QMainWindow, "NEWGAME_BTN") or self.ui.findChild(type(self.ui), "NEWGAME_BTN")
+        self.LOADGAME_BTN = self.ui.findChild(QMainWindow, "LOADGAME_BTN") or self.ui.findChild(type(self.ui), "LOADGAME_BTN")
+        self.EXITGAME_BTN = self.ui.findChild(QMainWindow, "EXITGAME_BTN") or self.ui.findChild(type(self.ui), "EXITGAME_BTN")
+
+        # 만약 버튼이 None이면, 아래처럼 찾기
+        self.NEWGAME_BTN = self.ui.findChild(type(self.ui), "NEWGAME_BTN")
+        self.LOADGAME_BTN = self.ui.findChild(type(self.ui), "LOADGAME_BTN")
+        self.EXITGAME_BTN = self.ui.findChild(type(self.ui), "EXITGAME_BTN")
+        
+        self.NEWGAME_BTN = self.ui.findChild(QPushButton, "NEWGAME_BTN")
+        self.LOADGAME_BTN = self.ui.findChild(QPushButton, "LOADGAME_BTN")
+        self.EXITGAME_BTN = self.ui.findChild(QPushButton, "EXITGAME_BTN")
 
         # 버튼 이벤트 연결
         self.NEWGAME_BTN.clicked.connect(self.create_game)
         self.LOADGAME_BTN.clicked.connect(self.load_game)
         self.EXITGAME_BTN.clicked.connect(self.exit_game)
 
+        self.setCentralWidget(self.ui)
+
     def create_game(self):
-        # QMessageBox.information(self, "새로 만들기", "새로운 파일을 만듭니다!")
         self.parent.NewGame()
 
     def load_game(self):
-        # 불러오기 페이지로 이동
-        # 부모(MainWindow)의 메서드를 호출하여 페이지 전환
-        # self.parent.load_character()
         self.parent.LoadGame()
 
     def exit_game(self):
@@ -34,18 +55,18 @@ class MainMenu(QMainWindow, form_class):
             self,
             "종료 확인",
             "종료하시겠습니까?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No
         )
-        if reply == QMessageBox.Yes:
+        if reply == QMessageBox.StandardButton.Yes:
             QApplication.quit()
-            
+
     def syncdata(self):
         pass
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    myWindow = MainWindow()
-    myWindow.show()
-    app.exec_()
+    # 부모를 None으로 했으니 실제 쓰는 MainWindow에 맞게 조정하세요
+    window = MainMenu()
+    window.show()
+    sys.exit(app.exec())

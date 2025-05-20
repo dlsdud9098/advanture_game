@@ -26,3 +26,7 @@ armor.output()
 from entity.money import Money
 money = Money()
 money.output()
+
+#%%
+from glob import glob
+glob('./UI/ui_files/*')

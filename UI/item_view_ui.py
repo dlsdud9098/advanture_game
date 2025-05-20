@@ -1,37 +1,37 @@
-from PyQt5 import uic
-from PyQt5.QtWidgets import (
-    QMainWindow,
-    QTableWidgetItem,
-    QTableWidget,
-    QSizePolicy,
-    QPushButton,
+from PySide6.QtWidgets import (
     QDialog,
-    QHeaderView
-    )
-from data.item_data import Item_SAVELOAD
-from PyQt5.QtCore import Qt
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
+)
+from PySide6.QtCore import Qt
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile
 
-# from unit.item import Item
+from data.item_data import Item_SAVELOAD
 from entity.item import Item
 
-form_class = uic.loadUiType("./UI/ui_files/item_view_ui.ui")[0]
+# from UI.ui_files.item_view_ui_pyside6 import Ui_Form
 
-class ItemViewWindow(QDialog, form_class):
+# class ItemViewWindow(QDialog, Ui_Form):
+class ItemViewWindow(QDialog):
     def __init__(self, item_data, parent=None):
         super().__init__(parent)
-        self.setupUi(self)
+        
+        # UI 파일 로드
+        ui_file = QFile("./UI/ui_files/item_view_ui.ui")
+        ui_file.open(QFile.ReadOnly)
+        loader = QUiLoader()
+        self.ui = loader.load(ui_file, self)
+        ui_file.close()
+        
+        self.setLayout(self.ui.layout())  # QDialog에 로드한 UI 배치
         
         self.setup_table(item_data)
+    
     def setup_table(self, item_data):
-        # 테이블 위젯 참조 (Designer에서 설정한 이름 사용)
-        table_widget = self.findChild(QTableWidget, "itemtableWidget")
+        table_widget = self.ui.findChild(QTableWidget, "itemtableWidget")
         
-        # 데이터 설정
-        table_widget.setRowCount(4)  # 행 개수 설정
-        table_widget.setColumnCount(2)  # 열 개수 설정
-        table_widget.setHorizontalHeaderLabels(["속성", "값"])
-        
-        # 데이터 설정
         details = [
             ("아이템 이름", item_data['name']),
             ("아이템 타입", item_data['type']),
@@ -42,43 +42,27 @@ class ItemViewWindow(QDialog, form_class):
             ("LUCK", item_data['required_stat'].get('LUCK', 0)),
         ]
         
-        # 테이블 행 및 열 설정
         table_widget.setRowCount(len(details))
         table_widget.setColumnCount(2)
         table_widget.setHorizontalHeaderLabels(["속성", "값"])
-        table_widget.verticalHeader().setVisible(False)  # 행 번호 숨기기
-
-        # 데이터 추가
+        table_widget.verticalHeader().setVisible(False)
+        
         for row, (attribute, value) in enumerate(details):
             table_widget.setItem(row, 0, self.CantEdit(attribute))
             table_widget.setItem(row, 1, self.CantEdit(str(value)))
-
-        # 열 크기 조정
+        
         table_widget.resizeColumnsToContents()
-        # table_widget.setColumnWidth(0, 150)  # 첫 번째 열 너비 고정
-        
-        # 열 비율 설정
-        self.set_column_weights(table_widget, [1,2])  # 첫 번째 열: 1, 두 번째 열: 2
-        
-        # 테이블 데이터 선택 못하게 하기
+        self.set_column_weights(table_widget, [1, 2])
+    
     def CantEdit(self, data):
-        # Name
         item = QTableWidgetItem(data)
         item.setTextAlignment(Qt.AlignCenter)
-        item.setFlags(item.flags() & ~Qt.ItemIsEditable)  # 수정 불가능
+        item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
         return item
     
     def set_column_weights(self, table_widget, weights):
-        """
-        테이블의 열 너비를 비율(weight)에 따라 설정합니다.
-
-        :param table_widget: QTableWidget 인스턴스
-        :param weights: 각 열의 비율을 리스트로 전달 (예: [1, 2, 1])
-        """
         header = table_widget.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Stretch)  # 전체 너비를 비율로 설정
+        header.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         total_weight = sum(weights)
-
-        # 각 열의 비율에 따라 크기 설정
         for i, weight in enumerate(weights):
             table_widget.setColumnWidth(i, int(weight / total_weight * table_widget.width()))

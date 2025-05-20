@@ -1,13 +1,14 @@
 import sys
 import os
-from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget
+from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile
 
+# UI 클래스 임포트
 from UI.main_menu_ui import MainMenu
 from UI.load_game_ui import LoadGameWindow
 from UI.new_game_ui import NewGameWindow
 from UI.start_main_ui import StartMainWindow
-
-# form_class = uic.loadUiType("./UI/ui_files/main.ui")[0]
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -56,4 +57,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window = MainWindow()
     main_window.show()
-    app.exec_()
+    app.exec()
