@@ -7,8 +7,13 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QTabWidget,
     QPushButton, 
+    QLineEdit,
+    QScrollArea,
+    QWidget,
+    QVBoxLayout,
+    QApplication
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
 
@@ -52,11 +57,27 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         self.ConnectInventoryTab()
         self.ConnectPlayerData()
         
-        
+    # 위젯 연결하기
     def ConnectWidget(self):
         self.SAVE_BTN = self.ui.findChild(QPushButton, 'SAVE_BTN')
         self.SAVE_BTN.clicked.connect(self.CharacterSave)
+
+        self.Chat_Spend_BTN = self.ui.findChild(QPushButton, 'Chat_Spend_BTN')
+        self.Chat_Spend_BTN.clicked.connect(self.Chatting)
         
+        self.chat_text = self.ui.findChild(QLineEdit, 'Chat_Text')
+        # 엔터 키로 입력받을 수 있도록 설정
+        self.chat_text.returnPressed.connect(self.Chatting)
+
+        self.main_content = self.ui.findChild(QScrollArea, 'MAIN_CONTENT')
+        self.scroll_content = self.ui.findChild(QWidget, 'scroll_content')
+
+        # scroll_content에 레이아웃 설정
+        self.scroll_layout = QVBoxLayout(self.scroll_content)
+        self.scroll_layout.setAlignment(Qt.AlignTop)  # 전체 내용을 상단에 정렬
+        self.scroll_layout.setSpacing(2)  # 라벨 간의 간격 축소
+        self.scroll_layout.setContentsMargins(0, 0, 0, 0)  # 레이아웃 여백 제거
+
         self.lv_label = self.ui.findChild(QLabel, 'LV_LABEL')
         self.name_label = self.ui.findChild(QLabel, 'NAME_LABEL')
         self.class_label = self.ui.findChild(QLabel, 'CLASS_LABEL')
@@ -92,6 +113,13 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         self.weapon_left_label.setText('비어있음')
         self.backpack_label_2 = self.ui.findChild(QLabel, 'BACKPACK_LABEL_2')
         self.backpack_label_2.setText('비어있음')
+
+        # 타이핑 효과 관련 변수 초기화
+        self.typing_timer = QTimer(self)
+        self.typing_timer.timeout.connect(self.display_next_character)
+        self.current_label = None
+        self.full_text = ""
+        self.current_index = 0
         
         self.item_labels = {
             '투구': self.helmat_label,
@@ -107,6 +135,7 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
             '양손 무기': [self.weapon_left_label, self.weapon_right_label]
         }
         
+    # 인벤토리 탭 불러오기
     def ConnectInventoryTab(self):
         self.inventory_tab = self.ui.findChild(QTabWidget, 'InventoryTab')
         self.inventory_tab.currentChanged.connect(self.on_tab_changed)
@@ -123,9 +152,10 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         self.armor_inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
         self.armor_inventory_table_widget.customContextMenuRequested.connect(self.ShowRightClick)
         
-        # self.consum_inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.consum_inventory_table_widget.customContextMenuRequested.connect(self.ShowRightClick)
+        self.consum_inventory_table_widget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.consum_inventory_table_widget.customContextMenuRequested.connect(self.ShowRightClick)
         
+    # 캐릭터 불러오기
     def ConnectPlayerData(self):
         self.lv_label.setText(str(self.player_data['lv']))
         self.name_label.setText(self.player_data['name'])
@@ -143,9 +173,11 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         self.backpacksize_label.setText(str(self.player_data['max_inventory_size']))
         self.player_inventory = self.player_data['inventory']
         
+    # 뒤로가기 & 현재 캐릭터 저장하기
     def CharacterSave(self):
         self.parent.switch_to_main_menu()
     
+    # 탭에서 인벤토리 변경하기
     def on_tab_changed(self, index):
         if index == 0:
             self.AllInventory()
@@ -171,11 +203,12 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         inventory_items = self.SearchItemList(self.player_data['inventory'])
         self.armor_inventory_table_widget = self.ArmorInventoryItems(self.armor_inventory_table_widget, inventory_items)
     
-    
+    # 소모품 인벤토리
     def ConsumInventory(self):
         inventory_items = self.SearchItemList(self.player_data['inventory'])
         self.consum_inventory_table_widget = self.ConsumInventoryItems(self.consum_inventory_table_widget, inventory_items)
     
+    # 우클릭 함수
     def ShowRightClick(self, pos):
         item = self.inventory_table_widget.itemAt(pos)
         if not item:
@@ -191,6 +224,7 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         wearLeft = None
         wearRight = None
         useItem = None
+
         if type_ in ['반지', '한 손 무기']:
             wearLeft = menu.addAction('왼손에 착용하기')
             wearRight = menu.addAction('오른손에 착용하기')
@@ -218,13 +252,78 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         
         self.SyncData()
             
+    # 아이템 상세보기 창 띄우기
     def show_item_detail(self, item_data):
         # 아이템 상세보기 다이얼로그 생성
         detail_dialog = ItemViewWindow(item_data, self)
         detail_dialog.exec_()    # 모달 창으로 실행
 
+    # 데이터 리로드
     def SyncData(self):
         self.ConnectPlayerData()
         self.AllInventory()
         self.ArmorInventory()
         self.ConsumInventory()
+
+    # 대화하기
+    def Chatting(self):
+        # QLineEdit에서 텍스트 가져오기
+        text = self.chat_text.text().strip()
+        if not text or self.typing_timer.isActive():
+            return  # 빈 입력이거나 타이머가 이미 실행 중이면 무시
+        
+        # 입력 필드 초기화
+        self.chat_text.clear()
+
+        # QLineEdit로 포커스를 다시 옮김
+        self.chat_text.setFocus()
+
+        self.add_typing_label(text)
+
+    # 텍스트를 한 글자씩 표시 시작
+    def start_typing(self, text, interval=100):
+        self.full_text = text
+        self.current_index = 0
+        self.current_label.setText("")
+        self.typing_timer.start(interval)  # interval 밀리초마다 한 글자씩 표시
+
+    # 다음 글자를 한 글자씩 표시
+    def display_next_character(self):
+        if self.current_index < len(self.full_text):
+            current_text = self.current_label.text()
+            self.current_label.setText(current_text + self.full_text[self.current_index])
+            self.current_index += 1
+
+            # 글자 추가될 때마다 스크롤 맨 아래로 이동
+            QApplication.processEvents()  # UI 이벤트 처리
+            self.main_content.verticalScrollBar().setValue(self.main_content.verticalScrollBar().maximum())
+        else:
+            self.typing_timer.stop()  # 모든 글자를 표시했으면 타이머 정지
+
+    # 실제 라벨 생성 및 타이핑 효과 시작 (시스템 문장 등은 이 함수 사용)
+    def add_typing_label(self, text):
+        self.current_label = QLabel("")
+        self.current_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        self.current_label.setWordWrap(True)
+        self.current_label.setStyleSheet("font-size: 20px; margin: 0px; padding: 0px;")
+        self.current_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.current_label.setMaximumWidth(self.scroll_content.width())  # 적절한 최대 너비 지정 (스크롤 영역 폭에 맞게 조절)
+        self.current_label.setMaximumHeight(self.scroll_content.height())  # 적절한 최대 너비 지정 (스크롤 영역 폭에 맞게 조절)
+        
+        self.scroll_layout.addWidget(self.current_label)
+
+        self.full_text = text
+        self.current_index = 0
+        self.typing_timer.start(10)
+
+        self.scroll_content.adjustSize()
+        QApplication.processEvents()
+        self.main_content.verticalScrollBar().setValue(self.main_content.verticalScrollBar().maximum())
+
+    # 시스템 메시지 출력용 함수
+    def system_message(self, text):
+        if self.typing_timer.isActive():
+            # 필요하면 타이머 종료하거나 큐에 넣는 로직 구현 가능
+            return
+    
+    
