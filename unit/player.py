@@ -11,8 +11,8 @@ class Player(Unit, Warrior, Money):
         # Money 초기화
         Money.__init__(self)
         
-        self.inventory = ['철 검', '철 갑옷', '하급 회복 물약', '철 반지', '철 반지', '미스릴 검', '철 대검']
-        # self.inventory = []
+        # self.inventory = ['철 검', '철 갑옷', '하급 회복 물약', '철 반지', '철 반지', '미스릴 검', '철 대검']
+        self.inventory = []
         self.max_inventory_size = 0    # 최대 인벤토리 용량
         
         self.skills = []

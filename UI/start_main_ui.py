@@ -16,26 +16,31 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile
+import json
+import uuid
 
 from data.save_load import Player_SAVELOAD
 from data.item_data import Item_SAVELOAD
 
 from .item_view_ui import ItemViewWindow
-
 from entity.item import Item
 from entity.armor import Armor
 from entity.consum import Consum
 
 from functions.show_inventory_items import ShowInventoryItems
+# from ai.brain_chat import Chat
+from ai.god_brain import God
+
 
 
 # form_class = ...  # PySide6에서는 uic.loadUiType가 없으므로, .ui를 py파일로 변환해 사용하거나 QUiLoader 사용 권장
 
 # class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_SAVELOAD):
-class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
+class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God):
     def __init__(self, parent, name):
         super().__init__()
         Item_SAVELOAD.__init__(self)
+        God.__init__(self)
         
         # self.setupUi(self)
         # .ui 파일 로드
@@ -51,11 +56,14 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         
         self.parent = parent
         
+        self.session1 = self.create_session()
+        
         self.player_data = Player_SAVELOAD().LoadPlayer(name)
     
         self.ConnectWidget()
         self.ConnectInventoryTab()
         self.ConnectPlayerData()
+        
         
     # 위젯 연결하기
     def ConnectWidget(self):
@@ -134,6 +142,12 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
             '가방': self.backpack_label_2,
             '양손 무기': [self.weapon_left_label, self.weapon_right_label]
         }
+        
+        
+        self.add_typing_label('당신은 ')
+        self.add_typing_label('이세계로 소환되었습니다.')
+        
+        
         
     # 인벤토리 탭 불러오기
     def ConnectInventoryTab(self):
@@ -269,6 +283,16 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
     def Chatting(self):
         # QLineEdit에서 텍스트 가져오기
         text = self.chat_text.text().strip()
+        
+        from data.data_files.npc_instruction import god_npc
+        system_instruction = god_npc.system_instruction
+        system_instruction += json.dumps(self.player_data, ensure_ascii=False)
+        system_instruction += '\n\n'
+        
+        with open('data/data_files/class_question.txt', 'r', encoding='utf-8') as f:
+            class_question = ''.join(f.readlines())
+        system_instruction += class_question
+        
         if not text or self.typing_timer.isActive():
             return  # 빈 입력이거나 타이머가 이미 실행 중이면 무시
         
@@ -279,13 +303,10 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         self.chat_text.setFocus()
 
         self.add_typing_label(text)
-
-    # 텍스트를 한 글자씩 표시 시작
-    def start_typing(self, text, interval=100):
-        self.full_text = text
-        self.current_index = 0
-        self.current_label.setText("")
-        self.typing_timer.start(interval)  # interval 밀리초마다 한 글자씩 표시
+        
+        # self.check_session()
+        response = self.Chat(session_id=self.session1, instruction=system_instruction, input_text=text)
+        self.add_typing_label(response)
 
     # 다음 글자를 한 글자씩 표시
     def display_next_character(self):
@@ -325,5 +346,32 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         if self.typing_timer.isActive():
             # 필요하면 타이머 종료하거나 큐에 넣는 로직 구현 가능
             return
-    
-    
+        
+    # def chat(self, session_id, instruction, input_text):
+    #     if session_id not in self.sessions:
+    #         print("Session not found. Please create a session first.")
+    #         return None
+
+    #     # 이전 대화 기록 누적
+    #     history = self.sessions[session_id]
+    #     history_text = ""
+    #     for turn in history:
+    #         history_text += f"User: {turn['user']}\nBot: {turn['bot']}\n"        
+        
+    #     # 최종 프롬프트 구성
+    #     prompt = f"{instruction}\n\n{history_text}User: {input_text}\nBot:"
+
+    #     inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048)
+    #     inputs = {k: v.to('cuda') for k, v in inputs.items()}
+
+    #     outputs = self.model.generate(**inputs, max_new_tokens=512, do_sample=True, temperature=0.7)
+    #     bot_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+    #     # self.add_message_to_session(session_id, input_text, bot_response)
+
+    #     self.add_typing_label(bot_response)
+        
+    # def check_session(self):
+    #     print("Session ID:", self.session1)
+    #     print("Sessions keys:", list(self.god.sessions.keys()))
+        

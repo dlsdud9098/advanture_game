@@ -1,0 +1,2 @@
+quest_id,quest_type,quest_difficult,quest_status,quest_name,quest_description,quest_trigger,quest_order,quest_completion_contitions,quest_fail_trigger,quest_reward,next_quest
+SYS0001,Nomal,F,Not Started,시작하기,게임을 시작하세요,"{'required_level': 1, 'required_items': [], 'required_class': ['All']}",System,{'target': 'None'},[],"{'xp': 100, 'money': 1000, 'items': ['철 검']}",
