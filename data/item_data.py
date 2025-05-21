@@ -10,7 +10,7 @@ class Item_SAVELOAD:
         if (not os.path.exists(self.item_data_path)) or (
             os.path.getsize(self.item_data_path) == 0
         ):
-            self.SaveData([])
+            self.SaveData(pd.DataFrame())
 
     #  데이터 불러오기(전체)
     def LoadData(self):
@@ -20,16 +20,14 @@ class Item_SAVELOAD:
 
     # 데이터 저장하기(전체)
     def SaveData(self, datas):
-        df = pd.DataFrame(datas)
-        
-        df.to_pickle(self.item_data_path)
+        datas.to_pickle(self.item_data_path)
 
     # 아이템 추가하기(관리자)
     def AddItem(self, data):
         datas = self.LoadData()
-        datas = datas.to_dict(orient='records')
-        datas.append(data)
-        
+
+        new_data = pd.DataFrame([data])  # 추가할 데이터를 DataFrame으로 변환
+        datas = pd.concat([datas, new_data], ignore_index=True)
         self.SaveData(datas)
 
     # 아이템 삭제하기
@@ -42,14 +40,18 @@ class Item_SAVELOAD:
 
     # 아이템 검색하기
     def SearchItem(self, name):
+        # 아이템이 장착되지 않은 상태
+        if name == None:
+            return
         df = self.LoadData()
-        
         df = df[df['name'] == name]
+
         if not df.empty:
             df = df.to_dict(orient='records')[0]
             return df
         else:
             print('아이템이 목록에 없습니다.')
+            return None
     
     # 아이템 검색(여러개)
     def SearchItemList(self, item_list):
@@ -61,3 +63,7 @@ class Item_SAVELOAD:
                 result.append(match.iloc[0].to_dict())  # 딕셔너리 형태로 데이터 가져오기
                 
         return result
+
+    # 아이템 초기화
+    def ResetItemData(self):
+        self.SaveData(pd.DataFrame())

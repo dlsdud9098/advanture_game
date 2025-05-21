@@ -188,12 +188,13 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
         
         menu = QMenu(self)
         wearArmor = None
+        wearLeft = None
+        wearRight = None
         useItem = None
-        if type_ in ['갑옷', '바지', '신발', '반지', '목걸이', '투구', '한 손 무기', '양손 무기']:
-            if type_ == '반지' or type_ == '한 손 무기':
-                wearLeft = menu.addAction('왼손에 착용하기')
-                wearRight = menu.addAction('오른손에 착용하기')
-            else:
+        if type_ in ['반지', '한 손 무기']:
+            wearLeft = menu.addAction('왼손에 착용하기')
+            wearRight = menu.addAction('오른손에 착용하기')
+        elif type_ in ['갑옷', '바지', '신발', '반지', '목걸이', '투구', '한 손 무기', '양손 무기']:
                 wearArmor = menu.addAction("착용하기")
         elif type_ == '소모품':
             useItem = menu.addAction("사용하기")
@@ -212,9 +213,16 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
             self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='right')
         elif action == useItem:
             pass
+        elif action == view_item:
+            self.show_item_detail(item_data)
         
         self.SyncData()
             
+    def show_item_detail(self, item_data):
+        # 아이템 상세보기 다이얼로그 생성
+        detail_dialog = ItemViewWindow(item_data, self)
+        detail_dialog.exec_()    # 모달 창으로 실행
+
     def SyncData(self):
         self.ConnectPlayerData()
         self.AllInventory()

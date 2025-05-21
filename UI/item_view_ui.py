@@ -40,6 +40,13 @@ class ItemViewWindow(QDialog):
             ("AGI", item_data['required_stat'].get('AGI', 0)),
             ("INT", item_data['required_stat'].get('INT', 0)),
             ("LUCK", item_data['required_stat'].get('LUCK', 0)),
+            ("아이템 상승 스탯", ""),
+            ("STR", item_data['up_stat'].get('STR', 0)),
+            ("AGI", item_data['up_stat'].get('AGI', 0)),
+            ("INT", item_data['up_stat'].get('INT', 0)),
+            ("LUCK", item_data['up_stat'].get('LUCK', 0)),
+            ("hp", item_data.get('hp', 0)),
+            ("mp", item_data.get('mp', 0)),
         ]
         
         table_widget.setRowCount(len(details))
