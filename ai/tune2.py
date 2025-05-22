@@ -2,22 +2,16 @@ import os
 import torch
 # from datasets import load_dataset
 from datasets import Dataset, concatenate_datasets
+from datasets import load_dataset
 
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
     BitsAndBytesConfig,
     TrainingArguments,
-    pipeline,
-    logging,
 )
-from peft import LoraConfig, get_peft_model, PeftModel
+from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer
-from datasets import load_dataset
-
-from glob import glob
-
-import subprocess
 
 os.environ["WANDB_DISABLED"] = "true"
 
@@ -32,9 +26,8 @@ torch.use_deterministic_algorithms(True)
 
 if __name__ == '__main__':
     base_path = '/home/apic/python/advanture_game'
-    # 8-bit BitsAndBytes config (8-bit uses bfloat16)
     bnb_config = BitsAndBytesConfig(
-    load_in_8bit=True
+        load_in_8bit=True
     )
 
     # 모델 불러오기
@@ -58,36 +51,37 @@ if __name__ == '__main__':
     tokenizer.padding_side = 'right'
     
     # 데이터 불러오기
-    dataset = load_dataset("json", data_files="data/data_files/npc_instruction/npc_god2.json")
+    dataset = load_dataset('json', data_files={'train': 'data/data_files/npc_instruction/npc_god2.json'})
 
-    def preprocess_function(examples):
-        inputs = examples["text"]  # 각 "text" 항목을 입력으로 사용
-        return tokenizer(inputs, truncation=True, max_length=512, padding='max_length')
+    def chat_format(row):
+        return tokenizer(row["text"], truncation=True, padding="max_length", max_length=512)
         
-    train = dataset.map(preprocess_function, batched=False, num_proc=4)
+    train = dataset.map(chat_format, batched=False, num_proc=4)
     
     # LoRA 설정
     lora_config = LoraConfig(
         r=8,
-        lora_alpha = 32,
-        lora_dropout = 0.1,
-        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
-        bias="none",
-        task_type="CAUSAL_LM",
+        lora_alpha=32,
+        target_modules=[
+            "q_proj", "v_proj", "k_proj", "o_proj",
+            "gate_proj", "down_proj", "up_proj"
+        ],
+        lora_dropout=0.1,
+        bias='none',
+        task_type='CAUSAL_LM'
     )
     
     model = get_peft_model(model, lora_config)
-    model.train()
 
     try:
         training_args = TrainingArguments(
             seed=42,
             output_dir=os.path.join(base_path, 'result'),
             num_train_epochs=3,
-            per_device_train_batch_size=10,  # vram 부족할 시 감소
+            per_device_train_batch_size=1,  # vram 부족할 시 감소
             per_device_eval_batch_size=2,   # vram 부족할 시 증가
             gradient_accumulation_steps=3,  # vram 부족할 시 감소
-            optim="paged_adamw_8bit",
+            optim="paged_adamw_32bit",
             eval_strategy="no",
             logging_dir=os.path.join(base_path, 'logs'),
             logging_steps=50,
@@ -100,10 +94,11 @@ if __name__ == '__main__':
         )
 
         trainer = SFTTrainer(
-            model=model,
-            train_dataset=train,
+            model=model.model,
+            train_dataset=train['train'],
             args=training_args,
             peft_config=lora_config,
+            # formatting_func=lambda x: x['input_ids']
         )
 
         trainer.train()
@@ -112,11 +107,3 @@ if __name__ == '__main__':
     
     trainer.model.save_pretrained(os.path.join(base_path, 'workspace/lora-adapter-epoch3'))
     print(f'./workspace/에 저장되었습니다.')
-
-
-
-
-
-
-
-    
