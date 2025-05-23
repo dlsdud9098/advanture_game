@@ -31,10 +31,18 @@ os.environ['CUBLAS_WORKSPACE_CONFIG'] = ":4096:8"  # (PyTorch 1.8 이상에서 �
 torch.use_deterministic_algorithms(True)
 
 if __name__ == '__main__':
+    # GPU 메모리 초기화
+    torch.cuda.empty_cache()
+    torch.cuda.reset_accumulated_memory_stats()
+    torch.cuda.reset_peak_memory_stats()
+
+
+
     base_path = '/home/apic/python/advanture_game'
     # 8-bit BitsAndBytes config (8-bit uses bfloat16)
     bnb_config = BitsAndBytesConfig(
-    load_in_8bit=True
+        load_in_8bit=True,
+        llm_int8_enable_fp32_cpu_offload=True
     )
 
     # 모델 불러오기
@@ -54,18 +62,23 @@ if __name__ == '__main__':
         cache_dir=os.path.join(base_path, 'workspace/cache')
     )
 
-    tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = 'right'
-    
-    # 데이터 불러오기
-    dataset = load_dataset("json", data_files="data/data_files/npc_instruction/npc_god2.json")
+    # pad_token 설정
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
 
-    def preprocess_function(examples):
-        inputs = examples["text"]  # 각 "text" 항목을 입력으로 사용
-        return tokenizer(inputs, truncation=True, max_length=512, padding='max_length')
-        
-    train = dataset.map(preprocess_function, batched=False, num_proc=4)
-    
+    with open("data/data_files/npc_instruction/npc_god copy.txt", "r", encoding="utf-8") as f:
+        texts = ["".join(f.readlines())]
+
+    # 토큰화, 여기서 return_tensors를 안 써서 리스트형 반환
+    tokenized_data = tokenizer(
+        texts,
+        truncation=True,
+        padding=True,
+    )
+
+    # Dataset 객체로 변환
+    train_dataset = Dataset.from_dict(tokenized_data)
+
     # LoRA 설정
     lora_config = LoraConfig(
         r=8,
@@ -83,10 +96,10 @@ if __name__ == '__main__':
         training_args = TrainingArguments(
             seed=42,
             output_dir=os.path.join(base_path, 'result'),
-            num_train_epochs=3,
-            per_device_train_batch_size=10,  # vram 부족할 시 감소
+            num_train_epochs=10,
+            per_device_train_batch_size=1,  # vram 부족할 시 감소
             per_device_eval_batch_size=2,   # vram 부족할 시 증가
-            gradient_accumulation_steps=3,  # vram 부족할 시 감소
+            gradient_accumulation_steps=1,  # vram 부족할 시 감소
             optim="paged_adamw_8bit",
             eval_strategy="no",
             logging_dir=os.path.join(base_path, 'logs'),
@@ -101,17 +114,20 @@ if __name__ == '__main__':
 
         trainer = SFTTrainer(
             model=model,
-            train_dataset=train,
+            train_dataset=train_dataset,
             args=training_args,
             peft_config=lora_config,
         )
 
         trainer.train()
+
+        trainer.model.save_pretrained(os.path.join(base_path, 'workspace/lora-adapter-epoch3'))
+        tokenizer.save_pretrained('workspace/lora-adapter-epoch3')
+        print(f'./workspace/에 저장되었습니다.')
     except RuntimeError as e:
             print(f"배치 크기에서 VRAM 부족: {e}")
     
-    trainer.model.save_pretrained(os.path.join(base_path, 'workspace/lora-adapter-epoch3'))
-    print(f'./workspace/에 저장되었습니다.')
+    
 
 
 
