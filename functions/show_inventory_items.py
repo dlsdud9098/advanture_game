@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import (
     QTableWidgetItem,
     QSizePolicy,
+    QHeaderView
 )
 from PySide6.QtCore import Qt
 
@@ -9,6 +10,7 @@ from entity.consum import Consum
 from data.item_data import Item_SAVELOAD
 
 class ShowInventoryItems(Item_SAVELOAD):
+    
     
     # 모든 아이템 목록 표시
     def AllInventoryItems(self, inventory_table_widget, inventory):
@@ -19,18 +21,17 @@ class ShowInventoryItems(Item_SAVELOAD):
         inventory_table_widget.setRowCount(len(inventory))
         inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
-        inventory_table_widget.setColumnWidth(0, 250)
-        inventory_table_widget.setColumnWidth(1, 300)
-        inventory_table_widget.setColumnWidth(2, 40)
-        inventory_table_widget.setColumnWidth(3, 40)
-        inventory_table_widget.setColumnWidth(4, 70)
-        
         for row_index, item_data in enumerate(inventory):
             inventory_table_widget.setItem(row_index, 0, self.CantEdit(item_data['name']))
             inventory_table_widget.setItem(row_index, 1, self.CantEdit(item_data['description']))
             inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(item_data['attack_score'])))
             inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(item_data['defense_score'])))
             inventory_table_widget.setItem(row_index, 4, self.CantEdit(item_data['type']))
+
+
+        # 열 크기 조정 모드를 Interactive로 설정
+        inventory_table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        self.set_column_weights(inventory_table_widget, [2, 8, 1, 1, 2]) 
 
         return inventory_table_widget
     
@@ -85,14 +86,18 @@ class ShowInventoryItems(Item_SAVELOAD):
             consum_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['defense_score'])))
             consum_inventory_table_widget.setItem(row_index, 4, self.CantEdit(wear_item['type']))
                 
+        self.set_column_weights(consum_inventory_table_widget, [2, 8, 1, 1, 2]) 
         return consum_inventory_table_widget
     
-    # 열 너비를 가중치 비율로 설정
     def set_column_weights(self, table_widget, weights):
         total_weight = sum(weights)
-        for i, weight in enumerate(weights):
-            width = int(table_widget.width() * (weight / total_weight)) - 3
-            table_widget.setColumnWidth(i, width)
+
+        # 가용 너비 계산
+        available_width = table_widget.viewport().width()  # 테이블의 가용 영역 너비 (테두리와 스크롤바 제외)
+
+        for index, weight in enumerate(weights):
+            column_width = int((weight / total_weight) * available_width)
+            table_widget.setColumnWidth(index, column_width)
             
     # 셀을 수정 불가능하게 만드는 아이템 생성 함수
     def CantEdit(self, data):

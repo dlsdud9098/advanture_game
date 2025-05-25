@@ -64,7 +64,6 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         self.ConnectInventoryTab()
         self.ConnectPlayerData()
         
-        
     # 위젯 연결하기
     def ConnectWidget(self):
         self.SAVE_BTN = self.ui.findChild(QPushButton, 'SAVE_BTN')
@@ -146,8 +145,6 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         
         self.add_typing_label('당신은 ')
         self.add_typing_label('이세계로 소환되었습니다.')
-        
-        
         
     # 인벤토리 탭 불러오기
     def ConnectInventoryTab(self):

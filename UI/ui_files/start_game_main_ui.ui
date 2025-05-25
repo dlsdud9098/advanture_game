@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1760</width>
-    <height>850</height>
+    <width>1698</width>
+    <height>840</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,7 +72,7 @@
     <rect>
      <x>869</x>
      <y>10</y>
-     <width>881</width>
+     <width>821</width>
      <height>821</height>
     </rect>
    </property>
@@ -586,12 +586,12 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="all_items">
        <property name="maximumSize">
         <size>
-         <width>803</width>
+         <width>811</width>
          <height>535</height>
         </size>
        </property>
@@ -613,12 +613,15 @@
           <height>541</height>
          </size>
         </property>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>135</number>
+        </attribute>
        </widget>
       </widget>
       <widget class="QWidget" name="armor_items">
        <property name="maximumSize">
         <size>
-         <width>803</width>
+         <width>811</width>
          <height>535</height>
         </size>
        </property>
@@ -636,7 +639,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>821</width>
+          <width>811</width>
           <height>551</height>
          </size>
         </property>
