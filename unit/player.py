@@ -47,6 +47,8 @@ class Player(Unit, Warrior, Money):
         self.money = 1000
         
         self.lv = 1
+
+        self.chapter = 'chapter 1-1'
     
         
         self.SettingClass()
@@ -118,7 +120,9 @@ class Player(Unit, Warrior, Money):
             'mp': self.mp,
             
             'money': self.money,
-            'wear_armor': self.wear_armor
+            'wear_armor': self.wear_armor,
+
+            'chapter': self.chapter
         }
         
         return stat
@@ -146,7 +150,9 @@ class Player(Unit, Warrior, Money):
             "wear_armor": self.wear_armor,
             "skill_point": self.skillpoint,
             "money": self.money,
-            "unit_type": self.unit_type
+            "unit_type": self.unit_type,
+
+            "chapter": self.chapter
         }
         
         return datas

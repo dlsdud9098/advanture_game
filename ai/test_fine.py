@@ -21,8 +21,8 @@ model = PeftModel.from_pretrained(base_model, fine_tuning_path)
 model.to('cuda')
 model.eval()
 
-PROMPT = "당신은 신 김샐프입니다. 플레이어가 당신에게 말을 건넵니다."
-instruction = "지금 내가 있는 곳은 어디지?"
+PROMPT = "당신은 신 김샐프입니다. 플레이어가 당신에게 말을 건넵니다. 현재 chapter 1-1"
+instruction = "뭐야. 여긴 어디야. 당신은 누구고?"
 messages = [
     {"role": "system", "content": f"{PROMPT}"},
     {"role": "user", "content": f"{instruction}"}
