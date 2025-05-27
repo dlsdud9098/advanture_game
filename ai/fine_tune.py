@@ -1,7 +1,9 @@
 import os
 import torch
-# from datasets import load_dataset
-from datasets import Dataset, concatenate_datasets
+from datasets import Dataset, concatenate_datasets, load_dataset
+from torch.utils.data import DataLoader
+from torch.cuda.amp import autocast
+from tqdm import tqdm
 
 from transformers import (
     AutoModelForCausalLM,
@@ -18,6 +20,8 @@ from datasets import load_dataset
 from glob import glob
 
 import subprocess
+from fine_tune_to_llm import fine_tune_llm
+from dynamicdataset import DynamicDataset
 
 os.environ["WANDB_DISABLED"] = "true"
 
@@ -45,11 +49,12 @@ if __name__ == '__main__':
         llm_int8_enable_fp32_cpu_offload=True
     )
 
-    # 모델 불러오기
+    # 모델 id
     model_id = "Bllossom/llama-3.2-Korean-Bllossom-3B"
 
     os.makedirs(name=os.path.join(base_path, 'workspace/cache'), exist_ok=os.path.join(base_path, 'workspace/cache'))
-    model = AutoModelForCausalLM.from_pretrained(
+    # 모델 불러오기
+    base_model = AutoModelForCausalLM.from_pretrained(
         model_id,
         quantization_config=bnb_config,
         device_map='auto',
@@ -66,25 +71,15 @@ if __name__ == '__main__':
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    train_data = []
+    # 데이터 불러오기
     files = []
-    files.extend(glob("data/data_files/npc_instruction/*.txt"))
+    files.extend(glob('data/data_files/npc_instruction/*.txt'))
     files.extend(glob('data/data_files/other_instruction/*.txt'))
-    for file in files:
-        with open(file, "r", encoding="utf-8") as f:
-            texts = "".join(f.readlines())
-            train_data.append(texts)
-
-    # 토큰화, 여기서 return_tensors를 안 써서 리스트형 반환
-    tokenized_data = tokenizer(
-        train_data,
-        truncation=True,
-        padding=True,
-    )
-
-    # Dataset 객체로 변환
-    train_dataset = Dataset.from_dict(tokenized_data)
-
+    
+    batch_size = 1
+    train_dataset = DynamicDataset(files, tokenizer)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, num_workers=4)
+    
     # LoRA 설정
     lora_config = LoraConfig(
         r=8,
@@ -95,50 +90,67 @@ if __name__ == '__main__':
         task_type="CAUSAL_LM",
     )
     
-    model = get_peft_model(model, lora_config)
-    model.train()
+    base_model = get_peft_model(base_model, lora_config)
+    base_model.train()  # 학습 모드로 변환
+    os.system('clear')
 
     try:
-        training_args = TrainingArguments(
-            seed=42,
-            output_dir=os.path.join(base_path, 'result'),
-            num_train_epochs=20,
-            per_device_train_batch_size=5,  # vram 부족할 시 감소
-            per_device_eval_batch_size=2,   # vram 부족할 시 증가
-            gradient_accumulation_steps=1,  # vram 부족할 시 감소
-            optim="paged_adamw_8bit",
-            eval_strategy="no",
-            logging_dir=os.path.join(base_path, 'logs'),
-            logging_steps=50,
-            warmup_steps=20,    
-            logging_strategy="steps",
-            learning_rate=2e-4,
-            group_by_length=True,
-            save_strategy="epoch",
-            fp16=True
-        )
+        optimizer = torch.optim.AdamW(base_model.parameters(), lr=2e-4)
+        
+        base_model.train()
+        # scaler = torch.cuda.amp.GradScaler()
+        num_epochs = 1
+        
+        for epoch in range(num_epochs):
+            total_loss = 0
+            total_correct = 0
+            total_tokens = 0
+            pbar = tqdm(train_dataloader, desc=f"Epoch {epoch+1}/{num_epochs}")
+            
+            for batch in pbar:
+                optimizer.zero_grad()
+                inputs = {key: val.to("cuda") for key, val in batch.items()}
+                # with autocast():
+                outputs = base_model(**inputs)
+                loss = outputs.loss
+                
+                # scaler.scale(loss).backward()
+                # scaler.step(optimizer)
+                # scaler.update()
+                optimizer.step()
+                loss.backward()
+                
+                total_loss += loss.item() * inputs['input_ids'].size(0)  # 배치 단위 loss 합산
 
-        trainer = SFTTrainer(
-            model=model,
-            train_dataset=train_dataset,
-            args=training_args,
-            peft_config=lora_config,
-        )
+                # 예측 결과 계산 (logits -> argmax)
+                logits = outputs.logits  # (batch_size, seq_len, vocab_size)
+                predictions = logits.argmax(dim=-1)  # (batch_size, seq_len)
 
-        trainer.train()
+                # 정답(labels)과 비교해서 정확도 계산
+                labels = inputs['labels']
+                mask = inputs['attention_mask'].bool()
 
-        trainer.model.save_pretrained(os.path.join(base_path, 'workspace/lora-adapter-epoch3'))
-        tokenizer.save_pretrained('workspace/lora-adapter-epoch3')
+                correct = ((predictions == labels) & mask).sum().item()
+                total_correct += correct
+                total_tokens += mask.sum().item()
+                
+            avg_loss = total_loss / total_tokens  # 전체 데이터 수로 나눠 평균 loss 계산
+            accuracy = total_correct / total_tokens if total_tokens > 0 else 0
+
+            print(f"Epoch {epoch+1}/{num_epochs} - Loss: {avg_loss:.4f}, Accuracy: {accuracy:.4f}")
+            
+        adapter_save_path = os.path.join(base_path, 'workspace/lora-adapter-epoch3')
+
+        # torch.cuda.empty_cache()
+        base_model.save_pretrained(adapter_save_path)
+        tokenizer.save_pretrained(adapter_save_path)
+        
         print(f'./workspace/에 저장되었습니다.')
+        
+        if os.path.exists(adapter_save_path):
+            fine_tune_llm()
+
     except RuntimeError as e:
             print(f"배치 크기에서 VRAM 부족: {e}")
     
-    
-
-
-
-
-
-
-
     

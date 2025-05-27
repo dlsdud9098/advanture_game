@@ -177,3 +177,5 @@ pyrightconfig.json
 workspace/
 result/
 bllossom2/
+bllossom/
+data/data_files/
