@@ -1,16 +1,18 @@
 from PySide6.QtWidgets import (
     QTableWidgetItem,
     QSizePolicy,
-    QHeaderView
+    QHeaderView,
+    QTabWidget
 )
 from PySide6.QtCore import Qt
 
 from entity.armor import Armor
 from entity.consum import Consum
 from data.item_data import Item_SAVELOAD
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtCore import QFile
 
 class ShowInventoryItems(Item_SAVELOAD):
-    
     
     # 모든 아이템 목록 표시
     def AllInventoryItems(self, inventory_table_widget, inventory):
@@ -31,6 +33,7 @@ class ShowInventoryItems(Item_SAVELOAD):
 
         # 열 크기 조정 모드를 Interactive로 설정
         inventory_table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Interactive)
+        inventory_table_widget.setFixedWidth(821)  # 가로 크기 고정
         self.set_column_weights(inventory_table_widget, [2, 8, 1, 1, 2]) 
 
         return inventory_table_widget
@@ -39,7 +42,7 @@ class ShowInventoryItems(Item_SAVELOAD):
     def ArmorInventoryItems(self, armor_inventory_table_widget, inventory):
         armor_inventory_table_widget.setColumnCount(6)
         armor_inventory_table_widget.setHorizontalHeaderLabels([
-            "상태", "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
+            "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
         ])
         
         armor_ = Armor()
@@ -49,14 +52,14 @@ class ShowInventoryItems(Item_SAVELOAD):
         armor_inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
         for row_index, wear_item in enumerate(wear_items):
-            armor_inventory_table_widget.setItem(row_index, 0, self.CantEdit('*'))
-            armor_inventory_table_widget.setItem(row_index, 1, self.CantEdit(wear_item['name']))
-            armor_inventory_table_widget.setItem(row_index, 2, self.CantEdit(wear_item['description']))
-            armor_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['attack_score'])))
-            armor_inventory_table_widget.setItem(row_index, 4, self.CantEdit(str(wear_item['defense_score'])))
-            armor_inventory_table_widget.setItem(row_index, 5, self.CantEdit(wear_item['type']))
+            armor_inventory_table_widget.setItem(row_index, 0, self.CantEdit(wear_item['name']))
+            armor_inventory_table_widget.setItem(row_index, 1, self.CantEdit(wear_item['description']))
+            armor_inventory_table_widget.setItem(row_index, 2, self.CantEdit(str(wear_item['attack_score'])))
+            armor_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['defense_score'])))
+            armor_inventory_table_widget.setItem(row_index, 4, self.CantEdit(wear_item['type']))
         
-        self.set_column_weights(armor_inventory_table_widget, [1, 2, 10, 1, 1, 1])    
+        armor_inventory_table_widget.setFixedWidth(821)  # 가로 크기 고정
+        self.set_column_weights(armor_inventory_table_widget, [2, 8, 1, 1, 2])    
         
         return armor_inventory_table_widget
     
@@ -64,7 +67,7 @@ class ShowInventoryItems(Item_SAVELOAD):
     def ConsumInventoryItems(self, consum_inventory_table_widget, inventory):
         consum_inventory_table_widget.setColumnCount(5)
         consum_inventory_table_widget.setHorizontalHeaderLabels([
-            "아이템 이름", "아이템 설명", "공격력", "방어력", "타입"
+            "아이템 이름", "아이템 설명", "HP", "MP", "타입"
         ])
 
         consum = Consum()
@@ -73,12 +76,6 @@ class ShowInventoryItems(Item_SAVELOAD):
         consum_inventory_table_widget.setRowCount(len(consum_items))
         consum_inventory_table_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
-        consum_inventory_table_widget.setColumnWidth(0, 250)
-        consum_inventory_table_widget.setColumnWidth(1, 300)
-        consum_inventory_table_widget.setColumnWidth(2, 40)
-        consum_inventory_table_widget.setColumnWidth(3, 40)
-        consum_inventory_table_widget.setColumnWidth(4, 70)
-        
         for row_index, wear_item in enumerate(consum_items):
             consum_inventory_table_widget.setItem(row_index, 0, self.CantEdit(wear_item['name']))
             consum_inventory_table_widget.setItem(row_index, 1, self.CantEdit(wear_item['description']))
@@ -86,6 +83,7 @@ class ShowInventoryItems(Item_SAVELOAD):
             consum_inventory_table_widget.setItem(row_index, 3, self.CantEdit(str(wear_item['defense_score'])))
             consum_inventory_table_widget.setItem(row_index, 4, self.CantEdit(wear_item['type']))
                 
+        consum_inventory_table_widget.setFixedWidth(821)  # 가로 크기 고정
         self.set_column_weights(consum_inventory_table_widget, [2, 8, 1, 1, 2]) 
         return consum_inventory_table_widget
     
@@ -105,3 +103,4 @@ class ShowInventoryItems(Item_SAVELOAD):
         item.setTextAlignment(Qt.AlignCenter)
         item.setFlags(item.flags() & ~Qt.ItemIsEditable)
         return item
+    

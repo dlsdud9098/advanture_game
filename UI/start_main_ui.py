@@ -29,18 +29,19 @@ from entity.consum import Consum
 
 from functions.show_inventory_items import ShowInventoryItems
 # from ai.brain_chat import Chat
-from ai.god_brain import God
+# from ai.god_brain import God
 
 
 
 # form_class = ...  # PySide6에서는 uic.loadUiType가 없으므로, .ui를 py파일로 변환해 사용하거나 QUiLoader 사용 권장
 
 # class StartMainWindow(QMainWindow, form_class, ShowInventoryItems, Armor, Item_SAVELOAD):
-class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God):
+# class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God):
+class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD):
     def __init__(self, parent, name):
         super().__init__()
         Item_SAVELOAD.__init__(self)
-        God.__init__(self)
+        # God.__init__(self)
         
         # self.setupUi(self)
         # .ui 파일 로드
@@ -55,14 +56,16 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         self.load_ui = None
         
         self.parent = parent
+        self.inventory_index = 0
         
-        self.session1 = self.create_session()
+        # self.session1 = self.create_session()
         
         self.player_data = Player_SAVELOAD().LoadPlayer(name)
     
         self.ConnectWidget()
         self.ConnectInventoryTab()
         self.ConnectPlayerData()
+        self.SyncData()
         
     # 위젯 연결하기
     def ConnectWidget(self):
@@ -192,10 +195,14 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
     def on_tab_changed(self, index):
         if index == 0:
             self.AllInventory()
+            self.inventory_index = 0
         elif index == 1:
             self.ArmorInventory()
+            self.inventory_index = 1
         elif index == 2:
             self.ConsumInventory()
+            self.inventory_index = 2
+
     
     # 수정 불가
     def CantEdit(self, data):
@@ -221,12 +228,21 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
     
     # 우클릭 함수
     def ShowRightClick(self, pos):
-        item = self.inventory_table_widget.itemAt(pos)
+        if self.inventory_index == 0:
+            target_table = self.inventory_table_widget
+        elif self.inventory_index == 1:
+            target_table = self.armor_inventory_table_widget
+        elif self.inventory_index == 2:
+            target_table = self.consum_inventory_table_widget
+
+
+        item = target_table.itemAt(pos)
+        row = item.row()
+        item_name = target_table.item(row, 0).text()
+
         if not item:
             return
         
-        row = item.row()
-        item_name = self.inventory_table_widget.item(row, 0).text()
         item_data = self.SearchItem(item_name)
         type_ = item_data['type']
         
@@ -242,7 +258,7 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         elif type_ in ['갑옷', '바지', '신발', '반지', '목걸이', '투구', '한 손 무기', '양손 무기']:
                 wearArmor = menu.addAction("착용하기")
         elif type_ == '소모품':
-            useItem = menu.addAction("사용하기")
+            useItem = menu.addAction("아이템 사용하기")
             
         view_item = menu.addAction("아이템 상세보기")
         
@@ -251,11 +267,11 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         if action is None:
             pass
         elif action == wearArmor:
-            self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels)
+            self.player_data = self.SetArmor(item_data, item_data['type'], self.player_data, self.item_labels)
         elif action == wearLeft:
-            self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='left')
+            self.player_data = self.SetArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='left')
         elif action == wearRight:
-            self.player_data = self.WearArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='right')
+            self.player_data = self.SetArmor(item_data, item_data['type'], self.player_data, self.item_labels, hands='right')
         elif action == useItem:
             pass
         elif action == view_item:
@@ -281,14 +297,14 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         # QLineEdit에서 텍스트 가져오기
         text = self.chat_text.text().strip()
         
-        from data.data_files.npc_instruction import god_npc
-        system_instruction = god_npc.system_instruction
-        system_instruction += json.dumps(self.player_data, ensure_ascii=False)
-        system_instruction += '\n\n'
+        # from data.data_files.npc_instruction import god_npc
+        # system_instruction = god_npc.system_instruction
+        # system_instruction += json.dumps(self.player_data, ensure_ascii=False)
+        # system_instruction += '\n\n'
         
-        with open('data/data_files/class_question.txt', 'r', encoding='utf-8') as f:
-            class_question = ''.join(f.readlines())
-        system_instruction += class_question
+        # with open('data/data_files/class_question.txt', 'r', encoding='utf-8') as f:
+        #     class_question = ''.join(f.readlines())
+        # system_instruction += class_question
         
         if not text or self.typing_timer.isActive():
             return  # 빈 입력이거나 타이머가 이미 실행 중이면 무시
@@ -302,8 +318,8 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
         self.add_typing_label(text)
         
         # self.check_session()
-        response = self.Chat(session_id=self.session1, instruction=system_instruction, input_text=text)
-        self.add_typing_label(response)
+        # response = self.Chat(session_id=self.session1, instruction=system_instruction, input_text=text)
+        # self.add_typing_label(response)
 
     # 다음 글자를 한 글자씩 표시
     def display_next_character(self):
@@ -332,7 +348,7 @@ class StartMainWindow(QMainWindow, ShowInventoryItems, Armor, Item_SAVELOAD, God
 
         self.full_text = text
         self.current_index = 0
-        self.typing_timer.start(10)
+        self.typing_timer.start(20) # 느리게: 숫자 커짐
 
         self.scroll_content.adjustSize()
         QApplication.processEvents()
