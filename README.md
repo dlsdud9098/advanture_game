@@ -277,3 +277,5 @@ python -c "from ai2 import GameAIController; ..."
 **Made with ❤️ by Adventure Game Team**
 
 *"AI와 함께하는 새로운 모험의 시작"*
+
+* 해당 README는 Claude를 통해 만들어 졌습니다 *
