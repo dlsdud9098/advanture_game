@@ -99,12 +99,12 @@ if __name__ == '__main__':
         
         base_model.train()
         # scaler = torch.cuda.amp.GradScaler()
-        num_epochs = 1
+        num_epochs = 5
         
+        total_loss = 0
+        total_correct = 0
+        total_tokens = 0
         for epoch in range(num_epochs):
-            total_loss = 0
-            total_correct = 0
-            total_tokens = 0
             pbar = tqdm(train_dataloader, desc=f"Epoch {epoch+1}/{num_epochs}")
             
             for batch in pbar:

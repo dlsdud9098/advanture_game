@@ -44,6 +44,7 @@ def ensure_directories():
 # 초기화 함수
 def initialize():
     """AI2 시스템 초기화"""
+    os.environ["QT_QPA_PLATFORM"] = "offscreen"  # GUI 없이 실행
     setup_logging()
     ensure_directories()
     

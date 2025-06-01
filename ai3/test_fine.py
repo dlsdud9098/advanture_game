@@ -22,7 +22,12 @@ model = PeftModel.from_pretrained(base_model, fine_tuning_path)
 model.to('cuda')
 model.eval()
 
-PROMPT = "당신은 신으로서 당신이 소환한 플레이어와 대화하세요. 그리고 문답을 통해 플레이어에게 스텟과 직업을 부여하세요 현재 상황은 플레이어가 처음으로 소환된 상황입니다."
+PROMPT = "당신은 <NPC:god>입니다. 당신은 신으로서 당신이 소환한 플레이어와 대화하세요. 그리고 문답을 통해 플레이어에게 스텟과 직업을 부여하세요 현재 상황은 플레이어가 처음으로 소환된 상황입니다."
+# PROMPT = """당신은 신입니다. 당신이 소환한 플레이어 에게 여러 질문(성격, 성향, 신념, 습관, 취미, 잘하는 것, 과거 등)을 하세요. 
+# 그리고 그 대답에 따라서 스텟(힘, 민첩, 지능, 운)과 직업(전사, 마법사, 궁수)를 부여하세요. 
+# 질문은 하나씩 하세요.
+# 대답에 따라서 어떤 스텟이 1 오르는지, 어떤 직업이 1 오르는지 표시하세요.
+# """
 instruction = "뭐야. 여긴 어디야. 당신은 누구고?"
 messages = [{"role": "system", "content": f"{PROMPT}"}]
 MAX_HISTORY = 5  # 유지할 최대 대화 수
@@ -55,7 +60,7 @@ def chat_with_model(user_input, messages, model, tokenizer):
     outputs = model.generate(
         input_ids,
         attention_mask=attention_mask,  # 명시적으로 attention_mask 전달
-        max_new_tokens=1024,
+        max_new_tokens=2048,
         pad_token_id=tokenizer.eos_token_id,  # pad_token_id 명시적으로 설정
         eos_token_id=terminators,
         do_sample=True,
@@ -67,7 +72,7 @@ def chat_with_model(user_input, messages, model, tokenizer):
     response = tokenizer.decode(outputs[0][input_ids.shape[-1]:], skip_special_tokens=True)
     
     # 모델 응답을 대화 히스토리에 추가
-    messages.append({"role": "assistant", "content": response})
+    messages.append({"role": "system", "content": response})
     return response
 
 
